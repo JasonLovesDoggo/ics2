@@ -444,9 +444,9 @@ void keyPressed() {
       isPaused = true;
     }
     key = 0; // needed so processing doesn't close when you click it.
-  } else if (keyCode == 37 ) { // Left arrow
+  } else if (keyCode == 37 && isPaused == false) { // Left arrow
     Prev();
-  } else if (keyCode == 39 ) { // Right arrow
+  } else if (keyCode == 39  && isPaused == false) { // Right arrow
     Next();
   }
 }
@@ -539,7 +539,7 @@ void introScene() {
 
   strokeWeight(5);
   line(140, 100, 460, 100); //bar that holds the curtains up
-  strokeWeight(1);
+  noStroke();
 
   pushMatrix();
   translate(-15, 0);
@@ -1530,6 +1530,7 @@ void tornadoScene() {
 
 
 void splashScreen() {
+  noStroke();
   babyEmotion = "sick";
   parentsMad=true;
   sitterEmotion="unamused";
