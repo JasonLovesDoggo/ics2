@@ -73,6 +73,9 @@ void setup() {
     .setValue(255)
     .setSize(40, 30)
     .setCaptionLabel(">")
+    .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
+    .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
+    .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
     .setBroadcast(true);
 
   Story();
@@ -171,6 +174,9 @@ void Next() {
       .setValue(255)
       .setSize(40, 30)
       .setCaptionLabel("<")
+      .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
+      .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
+      .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
       .setBroadcast(true);
   }
 
