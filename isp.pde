@@ -444,9 +444,9 @@ void keyPressed() {
       isPaused = true;
     }
     key = 0; // needed so processing doesn't close when you click it.
-  } else if (keyCode == 37 && isPaused == false) { // Left arrow
+  } else if (keyCode == 37 && isPaused == false && bt5.getController("Prev").isVisible()) { // Left arrow
     Prev();
-  } else if (keyCode == 39  && isPaused == false) { // Right arrow
+  } else if (keyCode == 39  && isPaused == false && bt5.getController("Next").isVisible()) { // Right arrow
     Next();
   }
 }
