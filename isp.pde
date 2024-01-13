@@ -44,17 +44,23 @@ float slowdownOne = 0; // a way to control the animation speed for one part of a
 
 
 
-int momArmX=400; //variables that help animate the charaters
+int momArmX=400; //variables that help animate the mom and dad
 int momArmY=232;
-
 int momBodyX=500;
 int dadBodyX=675;
 
-int sitterX=150;
+int sitterX=150; //variables that animate the babysitter
 int sitterArmY=360;
 int sitterArmX=210;
-int babyX=300;
-int fireY=281;
+
+int babyX=300; //variables that animate the baby
+int babyY=350;
+
+int fireY=281; //variable to animate the fire in scene 3
+
+
+int vomitX=340; //variables to animate the vomit of the baby in scene 8
+int vomitY=250;
 
 
 void setup() {
@@ -97,19 +103,55 @@ void Story() {
     }
     mainMenu();
   } else if (sceneNum == 2) {
+    momBodyX=500;
+    dadBodyX=675;
+    sitterX=150;
+    sitterArmX=210;
+    momArmX=400;
+    momArmY=232;
     introScene();
   } else if (sceneNum == 3) {
+    sitterX=150;
+    sitterArmX=210;
+    sitterArmY=360;
+    babyX=300;
+    babyY=350;
+    fireY=281;
     babyFireSlide();
   } else if (sceneNum == 4) {
+    sitterX=150;
+    sitterArmX=210;
+    sitterArmY=360;
+    babyX=300;
     babyCribScene();
   } else if (sceneNum == 5) {
+    babyX=300;
     babyCrawlScene();
   } else if (sceneNum == 6) {
+    babyX=300;
+    babyY=350;
     babyFallScene();
   } else if (sceneNum == 7) {
+    babyX=300;
+    babyY=350;
+    sitterX=150;
+    sitterArmX=210;
     babyPickupScene();
   } else if (sceneNum == 8) {
+    sitterX=150;
+    sitterArmX=210;
+    babyX=300;
+    babyY=350;
     babyPizzaScene();
+    sitterArmX=210;
+    sitterArmY=360;
+    sitterX=150;
+    vomitX=340;
+    vomitY=250;
+    momBodyX=500;
+    momArmX=400;
+    momArmY=232;
+    dadBodyX=675;
   } else if (sceneNum == 9) {
     tornadoScene();
   }
@@ -285,10 +327,6 @@ void draw() {
     if (sceneProgress >= 9 && fireY==250) {
       babyEmotion = "crying"; //showing how the baby is now crying because of the fire
     }
-    if (sceneProgress >= 11) {
-      //come back to finish later.
-    }
-
     babyFireSlide();
   }
 
@@ -296,7 +334,7 @@ void draw() {
   if (sceneNum == 4) {  //animation that happens in scene 4
     babyEmotion="crying";
 
-    if (sceneProgress == 0 && sceneNum == 4) {
+    if (sceneProgress >= 0 && babyX != -620) {
       sitterX=sitterX-10;
       sitterArmX=sitterArmX-10;
       sitterX= max (sitterX, -500);
@@ -306,7 +344,7 @@ void draw() {
       babyX= max(babyX, -620);
     }
 
-    if (sceneProgress >=1 && sceneNum == 4) {
+    if (sceneProgress >=1 && sceneNum == 4 && babyX <=-620) {
       sitterX=sitterX+10;
       sitterArmX=sitterArmX+10;
     }
@@ -323,6 +361,71 @@ void draw() {
     }
 
     babyCrawlScene();
+  }
+
+  if (sceneNum == 6) {
+    babyEmotion="shocked";
+    if (sceneProgress >= 0) {
+      babyY=babyY+10;
+    }
+
+    babyFallScene();
+  }
+
+  if (sceneNum == 7) {
+    babyEmotion="crying";
+    sitterEmotion="unamused";
+    if (sceneProgress >= 0) {
+      babyX=babyX+10;
+      babyY=babyY+5;
+      sitterX=sitterX-10;
+      sitterArmX=sitterArmX-10;
+
+
+      sitterArmX= max (sitterArmX, -210);
+      sitterX = max (sitterX, -270);
+      babyY= min (babyY, 525);
+      babyX= min (babyX, 650);
+    }
+    babyPickupScene();
+  }
+
+  if (sceneNum == 8) {
+    babyEmotion="normal";
+    sitterEmotion="unamused";
+    if (sceneProgress >=1) {
+      babyX-=5;
+
+      babyX = max (babyX, 100);
+    }
+    if (sceneProgress >= 2 && babyX == 100) {
+      babyEmotion="sick";
+    }
+    if (sceneProgress >=3) {
+      sitterEmotion="angry";
+    }
+    if (sceneProgress >=5) {
+      vomitX+=10;
+      vomitX= min(vomitX, 800);
+    }
+    if (sceneProgress >= 5 && vomitX == 800 && vomitY != 130) {
+      vomitY-=5;
+    }
+    if (vomitY == 130) {
+      vomitY+=200;
+    }
+
+    babyPizzaScene();
+  }
+  if (sceneProgress >=7 && vomitX == 800) {
+    parentsMad = true;
+    momBodyX+=10;
+    momArmX+=10;
+    dadBodyX+=10;
+
+    momBodyX= min(momBodyX, 1200);
+    momArmX= min (momArmX, 1100);
+    dadBodyX = min (dadBodyX, 1375);
   }
 }
 
@@ -360,6 +463,30 @@ void mouseClicked() {
     println(sceneProgress);
   }
   if (sceneNum==3) { //animation that appears in this scene
+    sceneProgress ++;
+    println(sceneProgress);
+  }
+  if (sceneNum==4) { //animation that appears in this scene
+    sceneProgress ++;
+    println(sceneProgress);
+  }
+  if (sceneNum==5) { //animation that appears in this scene
+    sceneProgress ++;
+    println(sceneProgress);
+  }
+  if (sceneNum==6) { //animation that appears in this scene
+    sceneProgress ++;
+    println(sceneProgress);
+  }
+  if (sceneNum==7) { //animation that appears in this scene
+    sceneProgress ++;
+    println(sceneProgress);
+  }
+  if (sceneNum==8) { //animation that appears in this scene
+    sceneProgress ++;
+    println(sceneProgress);
+  }
+  if (sceneNum==9) { //animation that appears in this scene
     sceneProgress ++;
     println(sceneProgress);
   }
@@ -818,6 +945,80 @@ void babyCribScene() {
   translate(900, 75);
   drawSitter();
   popMatrix();
+
+  if (sceneProgress == 0) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("Stay here until your parents come home you understand?", 100, 450);
+  }
+  if (sceneProgress == 1) {
+    pushMatrix();
+    scale(0.9);
+    translate(-240, 150);
+    fill(252, 232, 194);
+    ellipse(320, 340, 40, 40);
+    popMatrix();
+
+    fill(0);
+    text("gaaaaaa, gwahhhhhhhhh", 100, 450);
+  }
+  if (sceneProgress == 2) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("yeah yeah I get it....", 100, 450);
+  }
 }
 
 void babyCrawlScene() {
@@ -898,7 +1099,12 @@ void babyCrawlScene() {
   fill(206, 206, 200); //open door
   quad(18, 165, 100, 200, 100, 501, 18, 466);
 
-  if (sceneProgress >= 0 && babyX == 1100) {
+  if (sceneProgress == 0) {
+    fill(0);
+    text("it seems as if the babysitter left the door open, allowing the baby to escape it's room", 20, 450);
+  }
+
+  if (sceneProgress >= 1 && babyX == 1100) {
     pushMatrix();
     scale(0.9);
     translate(-240, 150);
@@ -908,7 +1114,7 @@ void babyCrawlScene() {
 
     fill(0);
 
-    text("Guh, wooooo", 100, 450);
+    text("Guh, gwoohhhh", 100, 450);
   }
 }
 
@@ -932,6 +1138,18 @@ void babyFallScene() {
   }
   line(0, 475, 332, 0);  //wall indicators
   line(800, 475, 800-332, 0);
+
+  pushMatrix();
+  translate(100, -500);
+  drawBaby();
+  popMatrix();
+
+  if (sceneNum >= 0) {
+    fill(0);
+    textSize(100);
+    text("GAHHAHDHAHGJGHAHGAHA", 0, 450);
+    textSize(20);
+  }
 }
 
 void babyPickupScene() {
@@ -976,6 +1194,83 @@ void babyPickupScene() {
   triangle(140, 150, 150, 170, 160, 150);
   triangle(280, 150, 270, 170, 260, 150);
   popMatrix();
+
+  pushMatrix();
+  scale(0.8);
+  translate(-350, -50);
+  drawBaby();
+  popMatrix();
+
+  pushMatrix();
+  scale(0.8);
+  translate(1000, 100);
+  drawSitter();
+  popMatrix();
+
+  if (sceneProgress == 1) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+
+    fill(0);
+    text("gosh, aren't you old enough to not fall down the stairs", 100, 450);
+  }
+
+  if (sceneProgress == 2) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 400);
+  }
 }
 
 void babyPizzaScene() {
@@ -991,9 +1286,24 @@ void babyPizzaScene() {
   line(75, 0, 75, 360); //wall indications
   line(725, 0, 725, 360);
 
+  pushMatrix();
+  scale(0.8);
+  translate(-900, -15);
+  drawMom();
+  drawDad();
+  popMatrix();
+
+  fill(227, 199, 162);
+  rect(0, 0, 125, 360);  //invisible block for the purpose of making it seem like the parents are in the background
   line(125, 360, 125, 50); //open concept wall opening
   line(675, 360, 675, 50);
   line(125, 50, 675, 50);
+
+  pushMatrix();
+  scale(0.8);
+  translate(700, 50);
+  drawSitter();
+  popMatrix();
 
   fill(178, 130, 54); //table in the center of the room
   beginShape(); //table stand
@@ -1009,6 +1319,188 @@ void babyPizzaScene() {
   endShape(CLOSE);
   fill(220, 160, 60); //table top
   ellipse(400, 380, 500, 150);
+
+  fill(180, 122, 33); //pizza that will be eaten by the baby
+  ellipse(300, 370, 120, 70);
+  fill(250, 72, 8);
+  ellipse(300, 370, 110, 60);
+  fill(245, 250, 187);
+  ellipse(300, 370, 105, 55);
+
+  pushMatrix();
+  scale(0.8);
+  translate(300, 70);
+  drawBaby();
+  popMatrix();
+
+
+  if (sceneProgress == 1) {
+    pushMatrix();
+    scale(0.9);
+    translate(-240, 150);
+    fill(252, 232, 194);
+    ellipse(320, 340, 40, 40);
+    popMatrix();
+
+    fill(0);
+    text("*sniff sniff* guh?", 100, 450);
+  }
+
+  if (sceneProgress == 2) {
+    pushMatrix();
+    scale(0.9);
+    translate(-240, 150);
+    fill(252, 232, 194);
+    ellipse(320, 340, 40, 40);
+    popMatrix();
+
+    fill(0);
+    text("*munch munch* \nGurk, guugugugu", 100, 450);
+  }
+
+  if (sceneProgress == 3) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+
+    fill(0);
+    text("What the heck is wrong with you! \nget off of the pizza!", 100, 450);
+  }
+
+  if (sceneProgress == 4) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("Oh no, don't you dare throw up!", 100, 450);
+  }
+  if (sceneProgress >=5 && babyX==100) {
+    fill(59, 155, 12);
+    triangle(babyX+255, babyY-20, vomitX, vomitY, vomitX, vomitY+40);
+  }
+  if (sceneProgress == 5 && babyEmotion=="sick") {
+
+    fill(0);
+    textSize(70);
+    text("BLEHHHHHHHHHHHHHHH", 50, 450);
+    textSize(20);
+  }
+  if (sceneProgress == 6) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    textSize(50);
+    text("EWWWWWW WHYYYYYYYYYYYY", 100, 450);
+    textSize(20);
+  }
+  if (sceneProgress == 7) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("YOU STUPID BABY!!!", 100, 450);
+  }
+  if (sceneProgress !=1 && momBodyX == 1200) {
+    fill(0);
+    text("how DARE you treat our baby like this! \nwe were watching you on the security cameras the ENTIRE time \nNOW GET OUT!!!", 100, 425);
+  }
 }
 
 void tornadoScene() {
@@ -1371,60 +1863,60 @@ void drawBaby() {
   if (sceneNum != 5) {
     stroke(0);
     fill(252, 232, 194);
-    rect(babyX, 350, 40, 40, 50, 50, 0, 0); //body
+    rect(babyX, babyY, 40, 40, 50, 50, 0, 0); //body
 
     fill(255);
-    rect(babyX-5, 380, 50, 10); //diaper
-    quad(babyX, 390, babyX+40, 390, babyX+35, 410, babyX+5, 410);
+    rect(babyX-5, babyY+30, 50, 10); //diaper
+    quad(babyX, babyY+40, babyX+40, babyY+40, babyX+35, babyY+60, babyX+5, babyY+60);
 
     fill(252, 232, 194);
-    rect(babyX-40, 360, 40, 10); //arms
-    rect(babyX+40, 360, 40, 10);
+    rect(babyX-40, babyY+10, 40, 10); //arms
+    rect(babyX+40, babyY+10, 40, 10);
 
-    quad(babyX+3, 398, babyX+5, 410, babyX-40, 420, babyX-40, 410); //legs
-    quad(babyX+37, 398, babyX+35, 410, babyX+80, 420, babyX+80, 410);
+    quad(babyX+3, babyY+48, babyX+5, babyY+60, babyX-40, babyY+70, babyX-40, babyY+60); //legs
+    quad(babyX+37, babyY+48, babyX+35, babyY+60, babyX+80, babyY+70, babyX+80, babyY+60);
 
 
     if (babyEmotion=="sick") {
       fill (167, 222, 157);
-      ellipse(babyX+20, 340, 40, 40); //head
+      ellipse(babyX+20, babyY-10, 40, 40); //head
 
       fill(0);  //eyes
-      arc(babyX+10, 340, 10, 15, radians(180), radians(360));
-      arc(babyX+30, 340, 10, 15, radians(180), radians(360));
+      arc(babyX+10, babyY-10, 10, 15, radians(180), radians(360));
+      arc(babyX+30, babyY-10, 10, 15, radians(180), radians(360));
     } else if (babyEmotion=="crying") {
       fill(252, 232, 194);
-      ellipse(babyX+20, 340, 40, 40); //head
+      ellipse(babyX+20, babyY-10, 40, 40); //head
 
       fill(0);
-      ellipse(babyX+5, 340, 15, 10); //eyes
-      ellipse(babyX+35, 340, 15, 10);
+      ellipse(babyX+5, babyY-10, 15, 10); //eyes
+      ellipse(babyX+35, babyY-10, 15, 10);
 
       fill(86, 218, 250);  //tears
-      rect(babyX-1, 345, 10, 20);
-      rect(babyX+29, 345, 10, 20);
+      rect(babyX-1, babyY-5, 10, 20);
+      rect(babyX+29, babyY-5, 10, 20);
     } else if (babyEmotion=="shocked") {
       fill(252, 232, 194);
-      ellipse(babyX-20, 340, 40, 40); //head
+      ellipse(babyX+20, babyY-10, 40, 40); //head
 
       fill(0);
-      ellipse(babyX+10, 340, 10, 20); //eyes
-      ellipse(babyX+30, 340, 10, 20);
+      ellipse(babyX+10, babyY-10, 10, 20); //eyes
+      ellipse(babyX+30, babyY-10, 10, 20);
 
       noFill();  //eyebrows
       stroke(255, 242, 121);
       strokeWeight(5);
-      arc(babyX+10, 325, 10, 10, radians(180), radians(360));
-      arc(babyX+30, 325, 10, 10, radians(180), radians(360));
+      arc(babyX+10, babyY-25, 10, 10, radians(180), radians(360));
+      arc(babyX+30, babyY-25, 10, 10, radians(180), radians(360));
 
       stroke(0);
       strokeWeight(1);
     } else {
       fill(252, 232, 194);
-      ellipse(babyX+20, 340, 40, 40); //head
+      ellipse(babyX+20, babyY-10, 40, 40); //head
       fill(0);
-      ellipse(babyX+10, 340, 10, 10); //eyes
-      ellipse(babyX+30, 340, 10, 10);
+      ellipse(babyX+10, babyY-10, 10, 10); //eyes
+      ellipse(babyX+30, babyY-10, 10, 10);
     }
   }
 
