@@ -13,8 +13,6 @@ todos:
  - look into slider for playMusic (p5 slider)
  - update the line "    if ((sceneNum == 8 || sceneNum == 8) && sceneProgress == 0) {" with the the second scene num or simply remove.
  - check the users username for bad chars
- - fix introScene so that the floor is a trapezoid instead of a rectangle
- - hide menu buttons on pause
  */
 
 
@@ -27,7 +25,7 @@ Changes from plan:
 
 
 ControlP5 bt5;  // variable for the button controller
-boolean playMusic = false; // if music should be played
+int musicVolume; // if music should be played
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
 boolean isPaused = false; // if the game is currently paused
 String username = "testing"; // the user's username
@@ -39,10 +37,6 @@ int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it
 PFont text;
 
 float slowdownOne = 0; // a way to control the animation speed for one part of a frame
-
-
-
-
 
 int momArmX=400; //variables that help animate the mom and dad
 int momArmY=232;
@@ -109,6 +103,16 @@ void Story() {
         .setColorBackground(color(0, 0, 0))
         .setPosition(middle + 190, height-125)
         .setSize(80, 50);
+
+
+      bt5.addSlider("musicVolume")
+        .setPosition(width/2 - 75, height-50)
+        .setSize(150, 20)
+        .setRange(0, 100)
+        .setValue(20) // default volume
+        .setColorBackground(color(0, 0, 0))
+        .setColorCaptionLabel(color(20, 20, 20));
+
 
       println(width/2);
     }
@@ -203,6 +207,7 @@ void Next() {
     bt5.getController("SetUsername").remove();
     bt5.getController("Exit").remove();
     bt5.getController("Instructions").remove();
+    bt5.getController("musicVolume").remove();
   }
 
   if (goNext == true) {
@@ -222,6 +227,7 @@ void Prev() {
       bt5.getController("Exit").remove();
       bt5.getController("Prev").remove();
       bt5.getController("Instructions").remove();
+      bt5.getController("musicVolume").remove();
     }
   }
   Story();
@@ -233,12 +239,11 @@ void mainMenu() {
 
   fill(0, 0, 0);
   int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
-  noStroke();
   rect(middle, height-125, 80, 50);
   //  text("Instructions", (width/2), height-(125 + (50/2)));
   bt5.addTextlabel("Instructions")
     .setText("Instructions")
-    .setPosition((width/2), height-(125 + (50/2)))
+    .setPosition(middle + 20, height-(125 + (50/2)))
     .setColorValue(0xffffff00);
 }
 
