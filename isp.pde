@@ -12,23 +12,24 @@ Authors: Jason Cameron & Simon Michetti
 /*
 Changes from plan:
  - drawRain & drawFire being changed from global varibles to methods
+ - renamed slowdownOne to slowdown and removed slowdownTwo
+ - renamed playMusic to musicVolume and added musicFile.
  */
 
 
 ControlP5 bt5;  // variable for the button controller
 SoundFile musicFile; // varible to load the sound file into and to be able to change volume globally
+PFont text; // varible so we can load in the font.
 int musicVolume; // if music should be played
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
+int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it adds queues for parents walking in)
 boolean isPaused = false; // if the game is currently paused
 String username = "testing"; // the user's username
 boolean parentsMad = false; // whether to draw the parents as mad or not
 String sitterEmotion = "unamused"; // the emotion to draw the sitter in
 String babyEmotion = "sick"; // the emotion to draw the baby in
-float slowdownTwo = 0; // a way to control the animation speed for certain parts of a frame
-int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it adds queues for parents walking in)
-PFont text;
+float slowdown = 0; // a way to control the animation speed for certain parts of a frame
 
-float slowdownOne = 0; // a way to control the animation speed for one part of a frame
 
 int momArmX=400; //variables that help animate the mom and dad
 int momArmY=232;
@@ -180,7 +181,9 @@ void Story() {
 
 void Next() {
   println("next!!!!!!!!!!");
-  println(sceneNum);
+  if (sceneNum == 1 && sceneProgress == 1) { // don't skin while in instructions
+    return;
+  }
   sceneProgress = 0;
   boolean goNext = true;
   if (sceneNum == 0 && bt5.getController("Prev") == null ) {
@@ -215,6 +218,9 @@ void Next() {
   }
 }
 void Prev() {
+  if (sceneNum == 1 && sceneProgress == 1) { // don't skin while in instructions
+    return;
+  }
   sceneProgress = 0;
   sceneNum = max(0, sceneNum - 1); // ensure it cannot go below zero
   if (!bt5.getController("Next").isVisible()) {
@@ -311,18 +317,13 @@ void draw() {
 
     return;
   }
-  slowdownOne++;
-  slowdownTwo++;
-  if (slowdownOne % 12 == 0) {
-  } // runs at 1/12th of the speed that draw does
-  if (slowdownTwo % 8 == 0) { // runs at 1/8th of the speed that draw does
+  slowdown++;
+  if (slowdown % 8 == 0) { // runs at 1/8th of the speed that draw does
     if ((sceneNum == 9) && sceneProgress >= 0) {
 
       drawRain();
     }
   }
-
-
 
 
   if (sceneNum==2) { //animation that appears in this screen
@@ -510,7 +511,7 @@ void keyPressed() {
       mainMenu();
     }
     if (sceneNum <= 1) { // don't pause on main menu or splash screen
-      key = 0; // reset key
+      key = 0; // reset key so it doesnt exit
       return;
     }
 
@@ -536,7 +537,6 @@ void keyPressed() {
   } else if ( key == ' ') { // if user just clicked space
 
 
-    print("space clicked");
     //  if (sceneNum >= 2) {
     sceneProgress ++;
     println(sceneProgress);
@@ -1699,9 +1699,6 @@ void splashScreen() {
   parentsMad=true;
   sitterEmotion="unamused";
 
-
-
-
   background(252, 229, 205); // beige bc
   fill(102, 0, 0);
   beginShape();
@@ -1737,14 +1734,12 @@ void splashScreen() {
   vertex(756, 233);
   vertex(776, 198);
   vertex(800, 130);
-
   vertex(800, 800);
   vertex(0, 800);
 
   endShape(CLOSE);
 
   fill(246, 178, 107);
-
   beginShape();
   vertex(0, 220);
   vertex(20, 310);
