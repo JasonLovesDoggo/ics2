@@ -4,7 +4,7 @@ import controlP5.*;
 Authors: Jason Cameron & Simon Michetti
  Teachers name: Ms. Basaraba
  Date: Dec 11th - Jan 15th
- Description: This program creates an immersive game in the background for users to learn about the dangers of babysitting
+ Description: This program creates an immersive game in the background for users to learn about the potential dangers of babysitting and provides an outline of what a bad babysitting habits look like. This game takes on a look don't tell form of communication where the player isn't explicitly told about what is going on but can clearly understand the ideas being presented.
  */
 
 
@@ -51,6 +51,7 @@ int dadBodyX=675;
 
 int sitterX=150; //variables that animate the babysitter
 int sitterArmY=360;
+int sitterArmY2=360;
 int sitterArmX=210;
 
 int babyX=300; //variables that animate the baby
@@ -86,23 +87,30 @@ void Exit() {
   exit();
 }
 
+
 void Story() {
   print("Going to: ");
   println(sceneNum);
   if (sceneNum == 0) {
+    momBodyX=500;
+    momArmY=232;
+    momArmX=400;
+    dadBodyX=675;
     splashScreen();
   } else if (sceneNum == 1) {
     if (bt5.getController("SetUsername") == null) { // if it does not already exist
+      int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
       bt5.addButton("SetUsername")
         .setColorBackground(color(0, 0, 0))
-        .setPosition(450, height-150)
+        .setPosition(middle - 190, height-125)
         .setSize(80, 50);
 
-      color(0, 0, 0);
       bt5.addButton("Exit")
         .setColorBackground(color(0, 0, 0))
-        .setPosition(250, height-150)
+        .setPosition(middle + 190, height-125)
         .setSize(80, 50);
+
+      println(width/2);
     }
     mainMenu();
   } else if (sceneNum == 2) {
@@ -110,6 +118,7 @@ void Story() {
     dadBodyX=675;
     sitterX=150;
     sitterArmX=210;
+    sitterArmY=360;
     momArmX=400;
     momArmY=232;
     introScene();
@@ -148,6 +157,7 @@ void Story() {
     babyPizzaScene();
     sitterArmX=210;
     sitterArmY=360;
+    sitterArmY2=360;
     sitterX=150;
     vomitX=340;
     vomitY=250;
@@ -156,6 +166,10 @@ void Story() {
     momArmY=232;
     dadBodyX=675;
   } else if (sceneNum == 9) {
+    sitterX=150;
+    sitterArmX=210;
+    sitterArmY=360;
+    sitterArmY2=360;
     tornadoScene();
   }
 }
@@ -188,6 +202,7 @@ void Next() {
     }
     bt5.getController("SetUsername").remove();
     bt5.getController("Exit").remove();
+    bt5.getController("Instructions").remove();
   }
 
   if (goNext == true) {
@@ -206,6 +221,7 @@ void Prev() {
       bt5.getController("SetUsername").remove();
       bt5.getController("Exit").remove();
       bt5.getController("Prev").remove();
+      bt5.getController("Instructions").remove();
     }
   }
   Story();
@@ -214,6 +230,16 @@ void Prev() {
 void mainMenu() {
   // other code is added in draw/Story
   splashScreen();
+
+  fill(0, 0, 0);
+  int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
+  noStroke();
+  rect(middle, height-125, 80, 50);
+  //  text("Instructions", (width/2), height-(125 + (50/2)));
+  bt5.addTextlabel("Instructions")
+    .setText("Instructions")
+    .setPosition((width/2), height-(125 + (50/2)))
+    .setColorValue(0xffffff00);
 }
 
 void SetUsername() {
@@ -235,13 +261,13 @@ void SetUsername() {
   JOptionPane.showMessageDialog(null, "Your username is: " + username);
 }
 void drawRain() {
-  if (sceneNum == 10 && sceneProgress == 0) { // on first part of tornado scene
+  if (sceneNum == 9 && sceneProgress >= 0) { // on first part of tornado scene
 
     ellipseMode(CENTER);
-    noStroke();
+    strokeWeight(1);
+    stroke(72, 150, 180);
     fill(72, 150, 180);
     for (int i = 0; i<50; i++) {
-      // todo add drawing bg
       ellipse(random(0, width), random(0, height), 2, 10);
     }
   }
@@ -249,11 +275,11 @@ void drawRain() {
 
 
 void draw() {
-
   if (isPaused == true) {
     rectMode(CORNERS);
     fill(0, 0, 0, 10); // slowly fill black
     rect(55, 55, width - 55, height - 55);
+    rectMode(CORNER); // reset it back
     if (bt5.getController("PauseExit") == null) {
       bt5.addButton("PauseExit")
         //  .setColorBackground(color(10, 10, 10))
@@ -265,12 +291,23 @@ void draw() {
     return;
   }
 
+
+  if (sceneProgress==1) {// if instructions is toggled on main menu
+    rectMode(CORNERS);
+    fill(0, 0, 0, 15); // quicklyish fill black
+    rect(55, 55, width - 55, height - 55);
+    rectMode(CORNER); // reset it back
+  } else {
+    splashScreen(); // continusly redraw bg unless if it's toggled
+  }
+
+
   slowdownOne++;
   slowdownTwo++;
   if (slowdownOne % 12 == 0) {
   } // runs at 1/12th of the speed that draw does
   if (slowdownTwo % 8 == 0) { // runs at 1/8th of the speed that draw does
-    if ((sceneNum == 8) && sceneProgress == 0) {
+    if ((sceneNum == 9) && sceneProgress >= 0) {
 
       drawRain();
     }
@@ -278,10 +315,9 @@ void draw() {
 
 
 
-  if (sceneNum==2) { //animation that appears in this screen
-    bt5.getController("Next").setVisible(false);
-    parentsMad = false;
 
+  if (sceneNum==2) { //animation that appears in this screen
+    parentsMad=false;
     if (sceneProgress == 1 || sceneNum==2) {
       line(450, 292, 440, 332); //left mom arm
       line(440, 332, momArmX+40, momArmY+150);
@@ -327,10 +363,13 @@ void draw() {
     }
     if (sceneProgress >=8 && babyX==25) {
       fireY=fireY-7;  //the fire on the stove turning on and burning the baby
-      fireY=fireY+2;
       fireY = max (fireY, 250);
     }
-    if (sceneProgress >= 9 && fireY==250) {
+    if (fireY==250) {
+      fireY+=20;
+    }
+
+    if (sceneProgress >= 9 && fireY>=250 && babyX == 25) {
       babyEmotion = "crying"; //showing how the baby is now crying because of the fire
     }
     babyFireSlide();
@@ -393,6 +432,9 @@ void draw() {
       babyY= min (babyY, 525);
       babyX= min (babyX, 650);
     }
+    if (sceneProgress >=1 && babyX==650) {
+      babyX-=20;
+    }
     babyPickupScene();
   }
 
@@ -433,10 +475,31 @@ void draw() {
     momArmX= min (momArmX, 1100);
     dadBodyX = min (dadBodyX, 1375);
   }
+
+  if (sceneNum == 9) {
+    sitterEmotion="angry";
+    if (sceneProgress >=2) {
+      sitterEmotion="shocked";
+      sitterArmY-=10;
+      sitterArmY2-=10;
+
+      sitterArmY= max (sitterArmY, 250);
+      sitterArmY2= max (sitterArmY2, 250);
+      println(sitterArmY);
+    }
+    stroke(0);
+    tornadoScene();
+    drawRain();
+  }
 }
 
 void keyPressed() {
   if (key == ESC) {
+    if (sceneNum <= 1) { // don't pause on main menu or splash screen
+      key = 0; // reset key
+      return;
+    }
+
     if (isPaused == true) {
       isPaused = false;
       bt5.getController("PauseExit").remove();
@@ -454,50 +517,33 @@ void keyPressed() {
     Prev();
   } else if (keyCode == 39  && isPaused == false && bt5.getController("Next").isVisible()) { // Right arrow
     Next();
+  } else if ( key == ' ') { // if user just clicked space
+
+
+    print("space clicked");
+    //  if (sceneNum >= 2) {
+    sceneProgress ++;
+    println(sceneProgress);
+    //}
   }
 }
 
 
 void mouseClicked() {
-  if (bt5.getController("Next").isVisible()) {
-    return;
-  }
-
-  print("Mouse clicked");
-  if (sceneNum == 2) {
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==3) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==4) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==5) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==6) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==7) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==8) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
-  }
-  if (sceneNum==9) { //animation that appears in this scene
-    sceneProgress ++;
-    println(sceneProgress);
+  /*
+  I needed to make Instructions this way due to the fact that if didn't plan for an instructions method and if I handled it annother way (such is bt5.getController("Instructions").isMouseClicked()) in draw, it would never be consistant.
+   */
+  if (sceneNum == 1 && sceneProgress == 0) { // if on main menu
+    boolean yCheck =  (mouseY <= (height-75) && mouseY >= height-(75+50));
+    boolean xCheck = (mouseX <= (width/2)-25 && mouseX >= (width/2)+25);
+    println(yCheck);
+    println(xCheck);
+    println("result:");
+    if (yCheck && xCheck) {
+      println("BOTH!");
+    }
   }
 }
-
 
 void introScene() {
   background(227, 199, 162);
@@ -545,7 +591,7 @@ void introScene() {
 
   strokeWeight(5);
   line(140, 100, 460, 100); //bar that holds the curtains up
-  noStroke();
+  strokeWeight(1);
 
   pushMatrix();
   translate(-15, 0);
@@ -560,7 +606,7 @@ void introScene() {
   drawSitter();
   popMatrix();
   textSize(15);
-  text("Click anywhere to go next", 20, 32) ;
+  text("Press space to continue", 20, 32) ;
   textSize(20);
   if (sceneNum == 2 && sceneProgress == 1) {
     pushMatrix(); //small icon to show which character is talking
@@ -650,10 +696,6 @@ void introScene() {
 
     fill(0);
     text("yeah yeah whatever....", 100, 450);
-  }
-
-  if (sceneNum==2 && sceneProgress >= 6 && momBodyX >=870 && sitterX <= -70) {
-    bt5.getController("Next").show();
   }
 }
 
@@ -792,7 +834,7 @@ void babyFireSlide() {
     text("Oh, that reminds me, your parents left me some money for pizza", 100, 450);
   }
 
-  if (sceneProgress <=11 && sceneProgress >=6) {
+  if (sceneProgress >=6 && sitterArmY==250) {
     fill(150); // the phone that suddenly appears in the babysitters hand
     rect(560, 250, 20, 35);
   }
@@ -825,7 +867,7 @@ void babyFireSlide() {
     triangle(175, 285, 215, 285, 200, fireY);
   }
 
-  if (sceneProgress == 9 && fireY==250) {
+  if (sceneProgress == 9 && babyX == 25) {
     pushMatrix();
     scale(0.9);
     translate(-240, 150);
@@ -1107,7 +1149,7 @@ void babyCrawlScene() {
 
   if (sceneProgress == 0) {
     fill(0);
-    text("it seems as if the babysitter left the door open, allowing the baby to escape it's room", 20, 450);
+    text("it seems as if the babysitter left the door open, \nallowing the baby to escape it's room", 200, 450);
   }
 
   if (sceneProgress >= 1 && babyX == 1100) {
@@ -1247,9 +1289,21 @@ void babyPickupScene() {
   }
 
   if (sceneProgress == 2) {
+    pushMatrix();
+    scale(0.9);
+    translate(-240, 150);
+    fill(252, 232, 194);
+    ellipse(320, 340, 40, 40);
+    popMatrix();
+
+    fill(0);
+    text("*hic hic* wahhahahahhhhahah", 100, 450);
+  }
+
+  if (sceneProgress == 3) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
-    translate(0, 900);
+    translate(0, 950);
     fill(252, 232, 194); //head
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
@@ -1275,7 +1329,7 @@ void babyPickupScene() {
     popMatrix();
 
     fill(0);
-    text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 400);
+    text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 425);
   }
 }
 
@@ -1532,6 +1586,76 @@ void tornadoScene() {
 
   fill(227, 199, 162);
   triangle(425, 75, 490, 50, 490, 90);
+
+  pushMatrix();
+  scale(0.9);
+  translate(600, 50);
+  drawSitter();
+  popMatrix();
+
+  if (sceneProgress == 1) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("Dammit, I can't believe they kicked me out", 100, 450);
+  }
+
+  if (sceneProgress == 2) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    text("Uh oh, is, is IS THAT A TORNDAO!!!", 100, 450);
+  }
 }
 
 
@@ -1633,7 +1757,7 @@ void splashScreen() {
   int baseY = 100; // base Y value to position other elements off of
   textSize(15);
   fill(102, 0, 0); // red
-  text("By Jason Cameron & Simon Michetti Studios", 60, baseY-10);
+  text("By Jason Cameron & Simon Michetti Studios", 76, baseY-10);
   textSize(20); // set it back to the original 20
   for (int x=90; x<=340; x+=(spacing+len)) {// from 300 to 100
     strokeWeight(4);
@@ -1682,6 +1806,7 @@ void drawSitter() {
     arc(sitterX-20, 200, 30, 30, radians(45), radians(225));
     arc(sitterX+20, 200, 30, 30, radians(315), radians(495));
 
+    stroke(1);
     line(sitterX, 120, sitterX-10, 110); //steam coming from the babysitters head
     line(sitterX-10, 110, sitterX+5, 110);
     strokeWeight(2);
@@ -1732,7 +1857,7 @@ void drawSitter() {
   }
 
   line(sitterX-40, 240, sitterX-60, 300); //left arm
-  line(sitterX-60, 300, sitterX-60, 360);
+  line(sitterX-60, 300, sitterX-60, sitterArmY2);
 
   line(sitterX+40, 240, sitterX+60, 300); //right arm
   line(sitterX+60, 300, sitterArmX, sitterArmY);
