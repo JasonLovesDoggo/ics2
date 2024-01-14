@@ -1,4 +1,5 @@
 import controlP5.*;
+import processing.sound.*;
 
 /*
 Authors: Jason Cameron & Simon Michetti
@@ -25,6 +26,7 @@ Changes from plan:
 
 
 ControlP5 bt5;  // variable for the button controller
+SoundFile musicFile;
 int musicVolume; // if music should be played
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
 boolean isPaused = false; // if the game is currently paused
@@ -61,6 +63,8 @@ int vomitY=250;
 void setup() {
   text = loadFont("Consolas-48.vlw");
   size(800, 500);
+  musicFile = new SoundFile(this, "ruins.mp3");
+  musicFile.loop(); // play and loop the sound file
   bt5 = new ControlP5(this);
   bt5.addButton("Next")
     .setBroadcast(false)
@@ -280,6 +284,10 @@ void drawRain() {
 
 
 void draw() {
+  if (sceneNum == 1 || isPaused) {
+    musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1 and we want to provide live updates
+    println(((float)musicVolume) / 100); // it takes
+  }
   if (isPaused == true) {
     rectMode(CORNERS);
     fill(0, 0, 0, 10); // slowly fill black
@@ -507,12 +515,14 @@ void keyPressed() {
 
     if (isPaused == true) {
       isPaused = false;
+      musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1
       bt5.getController("PauseExit").remove();
       bt5.show(); // show all buttons
 
       Story(); // redraw to clear out the pause menu
     } else {
       bt5.hide(); // hide all buttons
+      musicFile.amp(0); // mute audio while paused
 
       Story();
       isPaused = true;
