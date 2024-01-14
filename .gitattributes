@@ -1,3 +1,4 @@
+windows-amd64/ filter=lfs diff=lfs merge=lfs -text
 /data/Consolas-48.vlw filter=lfs diff=lfs merge=lfs -text
 /data/ruins.mp3 filter=lfs diff=lfs merge=lfs -text
 /windows-amd64/data/Consolas-48.vlw filter=lfs diff=lfs merge=lfs -text

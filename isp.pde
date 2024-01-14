@@ -10,23 +10,13 @@ Authors: Jason Cameron & Simon Michetti
 
 
 /*
-todos:
- - look into slider for playMusic (p5 slider)
- - update the line "    if ((sceneNum == 8 || sceneNum == 8) && sceneProgress == 0) {" with the the second scene num or simply remove.
- - check the users username for bad chars
- */
-
-
-
-
-/*
 Changes from plan:
  - drawRain & drawFire being changed from global varibles to methods
  */
 
 
 ControlP5 bt5;  // variable for the button controller
-SoundFile musicFile;
+SoundFile musicFile; // varible to load the sound file into and to be able to change volume globally
 int musicVolume; // if music should be played
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
 boolean isPaused = false; // if the game is currently paused
@@ -65,6 +55,8 @@ void setup() {
   size(800, 500);
   musicFile = new SoundFile(this, "ruins.mp3");
   musicFile.loop(); // play and loop the sound file
+  musicFile.amp(0.5); // set it to it's default of 50% volume
+
   bt5 = new ControlP5(this);
   bt5.addButton("Next")
     .setBroadcast(false)
@@ -101,11 +93,17 @@ void Story() {
       bt5.addButton("SetUsername")
         .setColorBackground(color(0, 0, 0))
         .setPosition(middle - 190, height-125)
+        .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
+        .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
+        .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
         .setSize(80, 50);
 
       bt5.addButton("Exit")
         .setColorBackground(color(0, 0, 0))
         .setPosition(middle + 190, height-125)
+        .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
+        .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
+        .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
         .setSize(80, 50);
 
 
@@ -113,12 +111,9 @@ void Story() {
         .setPosition(width/2 - 75, height-50)
         .setSize(150, 20)
         .setRange(0, 100)
-        .setValue(20) // default volume
+        .setValue(50) // default volume
         .setColorBackground(color(0, 0, 0))
         .setColorCaptionLabel(color(20, 20, 20));
-
-
-      println(width/2);
     }
     mainMenu();
   } else if (sceneNum == 2) {
@@ -242,25 +237,32 @@ void mainMenu() {
   splashScreen();
 
   fill(0, 0, 0);
+  noStroke();
   int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
   rect(middle, height-125, 80, 50);
   //  text("Instructions", (width/2), height-(125 + (50/2)));
-  bt5.addTextlabel("Instructions")
-    .setText("Instructions")
-    .setPosition(middle + 20, height-(125 + (50/2)))
-    .setColorValue(0xffffff00);
+  if (bt5.getController("Instructions") == null) { // only add it if it doest already exist
+    bt5.addTextlabel("Instructions")
+      .setText("Instructions")
+      .setPosition(middle + 10, height-(125 - (50/2) + 5))
+
+      .setColorValue(0xffffff00);
+  }
 }
 
 void SetUsername() {
   while (true) {
-    String tempusername = getString("Please enter a username (5-20chars)");
+    String tempusername = getString("Please enter a username (3-15chars)");
     if (tempusername == null) {
       continue;
     }
-    if (tempusername.length() > 20) {
-      JOptionPane.showMessageDialog(null, "the max length is 20 chars, you tried to set it to: " + str(tempusername.length()));
-    } else if (tempusername.length() < 3) {// todo add content filtering
+    if (tempusername.length() > 15) { // if the username is greater than 15 chars
+      JOptionPane.showMessageDialog(null, "the max length is 15 chars, you tried to set it to: " + str(tempusername.length()));
+    } else if (tempusername.length() < 3) { // if the username is less than 3 chars
+
       JOptionPane.showMessageDialog(null, "the min length is 3 chars, you tried to set it to: " + str(tempusername.length()));
+    } else if (!tempusername.matches("\\p{Alpha}*")) { // if the username does not only contain letters.
+      JOptionPane.showMessageDialog(null, "Your username cannot contain non letters. Please try again.");
     } else {
       username = tempusername;
       break;
@@ -286,7 +288,6 @@ void drawRain() {
 void draw() {
   if (sceneNum == 1 || isPaused) {
     musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1 and we want to provide live updates
-    println(((float)musicVolume) / 100); // it takes
   }
   if (isPaused == true) {
     rectMode(CORNERS);
@@ -303,18 +304,6 @@ void draw() {
 
     return;
   }
-
-
-  if (sceneProgress==1) {// if instructions is toggled on main menu
-    rectMode(CORNERS);
-    fill(0, 0, 0, 15); // quicklyish fill black
-    rect(55, 55, width - 55, height - 55);
-    rectMode(CORNER); // reset it back
-  } else {
-    splashScreen(); // continusly redraw bg unless if it's toggled
-  }
-
-
   slowdownOne++;
   slowdownTwo++;
   if (slowdownOne % 12 == 0) {
@@ -508,6 +497,11 @@ void draw() {
 
 void keyPressed() {
   if (key == ESC) {
+    if (sceneNum == 1 && sceneProgress == 1) { // if on instructions in main menu
+      sceneProgress = 0;
+      bt5.show();
+      mainMenu();
+    }
     if (sceneNum <= 1) { // don't pause on main menu or splash screen
       key = 0; // reset key
       return;
@@ -548,14 +542,31 @@ void mouseClicked() {
   /*
   I needed to make Instructions this way due to the fact that if didn't plan for an instructions method and if I handled it annother way (such is bt5.getController("Instructions").isMouseClicked()) in draw, it would never be consistant.
    */
-  if (sceneNum == 1 && sceneProgress == 0) { // if on main menu
-    boolean yCheck =  (mouseY <= (height-75) && mouseY >= height-(75+50));
-    boolean xCheck = (mouseX <= (width/2)-25 && mouseX >= (width/2)+25);
-    println(yCheck);
-    println(xCheck);
-    println("result:");
-    if (yCheck && xCheck) {
-      println("BOTH!");
+  if (sceneNum == 1) { // if on main menu
+    if (sceneProgress == 0) { // if instructions are NOT toggled
+      int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
+      boolean yCheck =  (mouseY <= (height-75) && mouseY >= height-(75+50));
+      boolean xCheck = (mouseX >= middle && mouseX <= middle+80); // 80 is the width of the box
+      if (yCheck && xCheck) { // if the user is pressing the button and not somewhere else
+        bt5.hide(); // hide all controllers
+        sceneProgress = 1; // so that other controllers can check.
+        rectMode(CORNERS);
+        noStroke(); // dont do red outline
+        fill(0, 0, 0); // quicklyish fill black
+        rect(55, 55, width - 55, height - 55);
+        rectMode(CORNER); // reset it back
+
+        text("Press ESC or click anywhere to get out", 55, 45);
+        fill(255); // set text color to white
+        text("X", 70, 85); // an X just to make it more clear
+
+
+        // todo: Write instructions
+      }
+    } else { // instructions ARE toggled so unset.
+      sceneProgress = 0; // set to "not on instructions"
+      bt5.show(); // show the selection buttons again
+      mainMenu(); // call it to clear the instructions
     }
   }
 }
