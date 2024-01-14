@@ -289,6 +289,13 @@ void draw() {
   if (sceneNum == 1 || isPaused) {
     musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1 and we want to provide live updates
   }
+  //if (sceneNum == 1 && sceneProgress == 1) { // if on main menu and is on instructions
+  //  print("hi");
+  //  bt5.hide(); // hide all controllers
+  //  bt5.getController("Next").hide();
+  //  bt5.getController("Prev").hide();
+  //}
+
   if (isPaused == true) {
     rectMode(CORNERS);
     fill(0, 0, 0, 10); // slowly fill black
@@ -548,7 +555,8 @@ void mouseClicked() {
       boolean yCheck =  (mouseY <= (height-75) && mouseY >= height-(75+50));
       boolean xCheck = (mouseX >= middle && mouseX <= middle+80); // 80 is the width of the box
       if (yCheck && xCheck) { // if the user is pressing the button and not somewhere else
-        bt5.hide(); // hide all controllers
+        bt5.hide();
+
         sceneProgress = 1; // so that other controllers can check.
         rectMode(CORNERS);
         noStroke(); // dont do red outline
