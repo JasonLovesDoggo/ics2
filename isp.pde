@@ -2165,7 +2165,6 @@ void drawBaby() {
     } else if (babyEmotion=="shocked") {
       fill(252, 232, 194);
       ellipse(babyX+20, babyY-10, 40, 40); //head
-
       fill(0);
       ellipse(babyX+10, babyY-10, 10, 20); //eyes
       ellipse(babyX+30, babyY-10, 10, 20);
