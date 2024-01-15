@@ -1,4 +1,5 @@
 import controlP5.*;
+import controlP5.BitFont;
 import processing.sound.*;
 
 /*
@@ -47,7 +48,6 @@ int fireY=281; //variable to animate the fire in scene 3
 
 int vomitX=340; //variables to animate the vomit of the baby in scene 8
 int vomitY=250;
-
 int tornadoX=-300; //variable to move the tornado around in the last scene
 int tornadoProgress=1; //variable to control tornado movement in the final scene
 
@@ -56,7 +56,7 @@ void setup() {
   size(800, 500);
   musicFile = new SoundFile(this, "ruins.mp3"); // load the sound file from the data folder
   musicFile.loop(); // play and loop the sound file
-  musicFile.amp(musicVolume); // set it to it's default of 50% volume
+  musicFile.amp(musicVolume / 100); // set it to it's default of 50% volume
 
   bt5 = new ControlP5(this);
   bt5.addButton("Next")
@@ -73,22 +73,19 @@ void setup() {
   Story();
 }
 
-void Exit() {
-  JOptionPane.showMessageDialog(null, "Thank you for playing babysitter hell simulator!");
-  exit();
-}
+
 
 
 void Story() {
-  print("Going to: ");
-  println(sceneNum);
+  print("Going to: " + sceneNum);
   if (sceneNum == 0) {
     momBodyX=500;
     momArmY=232;
     momArmX=400;
     dadBodyX=675;
     splashScreen();
-  } else if (sceneNum == 1) {
+  } else if (sceneNum == 1 || sceneNum == -1) {
+    print((bt5.getController("SetUsername") == null));
     if (bt5.getController("SetUsername") == null) { // if it does not already exist
       int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
       bt5.addButton("SetUsername")
@@ -213,7 +210,7 @@ void Next() {
   }
 
   if (goNext == true) {
-    sceneNum = (min(sceneNum +1, 9));
+    sceneNum = (min(sceneNum +1, 9)); // prevent going over last scene
     Story();
   }
 }
@@ -240,6 +237,7 @@ void Prev() {
 
 void mainMenu() {
   // other code is added in draw/Story
+  bt5.show();
   splashScreen();
 
   fill(0, 0, 0);
@@ -303,11 +301,36 @@ void draw() {
   //}
 
   if (isPaused == true) {
+    /*
+    I need to do custom buttons for this as there is a bug where controlp5 only
+     */
     rectMode(CORNERS);
     fill(0, 0, 0, 10); // slowly fill black
     rect(55, 55, width - 55, height - 55);
-    rectMode(CORNER); // reset it back
+    rectMode(CENTER);
+    int Ymiddle = (height/2); // compensate for the fact that controlp5 draws from top corner
+    int Bwidth = 77; // width of the buttons
+    int Bheight = 40; // height of the buttons
+    float spacing = 2* Bwidth;// + (Bwidth / 2);
 
+    fill(255); // set button color to white
+
+    rect(31+ (spacing * 1), Ymiddle, Bwidth, Bheight);
+    rect(31+  (spacing * 2), Ymiddle, Bwidth, Bheight);
+    rect(31+ (spacing * 3), Ymiddle, Bwidth, Bheight);
+    rect(31+ (spacing * 4), Ymiddle, Bwidth, Bheight);
+    rectMode(CORNER);
+    fill(0); // set color to black
+    textSize(16);
+    Ymiddle+=5; // so text is centered
+    // Labels for the buttons
+    text("Exit", 18 + (spacing * 1), Ymiddle);
+    textSize(14);
+    text("Set Volume", (spacing * 3) - 1, Ymiddle);
+    text("Main Menu", (spacing * 4) - 1, Ymiddle);
+    textSize(13);
+    text("Instructions", (spacing * 2) - 1, Ymiddle);
+    textSize(20); // reset font to norm
     return;
   }
   slowdown++;
@@ -555,7 +578,7 @@ void keyPressed() {
       isPaused = true;
     }
     key = 0; // needed so processing doesn't close when you click it.
-  } else if (keyCode == 37 && isPaused == false && bt5.getController("Prev").isVisible()) { // Left arrow
+  } else if (keyCode == 37 && isPaused == false && bt5.getController("Prev") != null && bt5.getController("Prev").isVisible()) { // Left arrow
     Prev();
   } else if (keyCode == 39  && isPaused == false && bt5.getController("Next").isVisible()) { // Right arrow
     Next();
@@ -569,14 +592,19 @@ void keyPressed() {
   }
 }
 
-
+void Exit() {
+  JOptionPane.showMessageDialog(null, "Thank you for playing babysitter hell simulator!");
+  exit();
+}
 void mouseClicked() {
   /*
   I needed to make Instructions this way due to the fact that if didn't plan for an instructions method and if I handled it annother way (such is bt5.getController("Instructions").isMouseClicked()) in draw, it would never be consistant.
    */
+  int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
+  println(sceneNum);
+  println(sceneProgress);
   if (sceneNum == 1) { // if on main menu
     if (sceneProgress == 0) { // if instructions are NOT toggled
-      int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
       boolean yCheck = (mouseY <= (height-75) && mouseY >= height-(75+50));
       boolean xCheck = (mouseX >= middle && mouseX <= middle+80); // 80 is the width of the box
       if (yCheck && xCheck) { // if the user is pressing the button and not somewhere else
@@ -584,7 +612,7 @@ void mouseClicked() {
 
         sceneProgress = 1; // so that other controllers can check.
         rectMode(CORNERS);
-        noStroke(); // dont do red outline
+        noStroke(); // doFnt do red outline
         fill(0, 0, 0); // quicklyish fill black
         rect(55, 55, width - 55, height - 55);
         rectMode(CORNER); // reset it back
@@ -601,23 +629,46 @@ void mouseClicked() {
       mainMenu(); // call it to clear the instructions
     }
   } else if (isPaused) {
-    int middle = (width/2) - 40; // compensate for the fact that rects draw from top corner
-
     /* Layout
      Button = 80px
      Gap = 40px
      G|P = middle of screen + gap
-     Button Gap Button G|P Button
+     Button Gap Button G|P Button Gap Button
      */
-    boolean yCheck = (mouseY <= (height-75) && mouseY >= height/2-(75+50)); // y check for all
+    boolean yCheck = (mouseY >= (height/2)-20 && mouseY <= (height/2)+20); // y check for all
 
-    boolean xCheckExit = (mouseX >= middle - 240 && mouseX <= middle-120); // x position check for exit
-    boolean xCheckInstuctions = (mouseX >= middle  && mouseX <= middle+80); // x position check for Instructions
-    boolean xCheckMainMenu = (mouseX >= middle && mouseX <= middle+80); // x position check for Main Menu
-    boolean xCheckSetAudio = (mouseX >= middle && mouseX <= middle+80); // x position check for Set Audio
+    boolean xCheckExit = (mouseX >= 147 && mouseX <= 223); // x position check for exit
+    boolean xCheckInstuctions = (mouseX >= 147+ 154  && mouseX <= 223 +154); // x position check for Instructions
+    boolean xCheckSetAudio = (mouseX >= 147+(154*2) && mouseX <= 223+(154*2)); // x position check for Main Menu
+    boolean xCheckMainMenu = (mouseX >= 147+(154*3) && mouseX <= 223+(154*3)); // x position check for Set Audio
 
-
-    
+    if (yCheck == true) {
+      if (xCheckExit == true) {
+        Exit();
+      }
+      if (xCheckInstuctions == true) {
+        println("xCheckInstuctions");
+      }
+      if (xCheckMainMenu == true) { // if user clicked on main menu button
+        isPaused = false;
+        sceneNum = 1; // main menu scene num
+        bt5.show();
+        Story();
+      }
+      if (xCheckSetAudio == true) {
+        while (true) {
+          int tempVolume = getInt("Please enter your desired volume (between 0 for muted and 100 for full volume)");
+          if (tempVolume > 100 || tempVolume < 0) {
+            JOptionPane.showMessageDialog(null, "You tried entering: " +  tempVolume + ". The volume must be between 0-100.");
+          } else {
+            JOptionPane.showMessageDialog(null, "The volume has been set to: " +  tempVolume + "%");
+            musicVolume = tempVolume;
+            musicFile.amp(musicVolume / 100); // set it to it's default of 50% volume
+            break;
+          }
+        }
+      }
+    }
 
 
 
@@ -952,7 +1003,7 @@ void babyFireSlide() {
     triangle(175, 285, 215, 285, 200, fireY);
   }
 
-  if (sceneProgress == 9 && babyX == 25) {
+  if (sceneProgress >= 9 && babyX == 25) {
     pushMatrix();
     scale(0.9);
     translate(-240, 150);
@@ -964,7 +1015,7 @@ void babyFireSlide() {
     text("Wahhhh wahhhhhhh \nWAHHHHHHHHHHHHHHHHH", 100, 450);
   }
 
-  if (sceneProgress == 10 && babyEmotion == "crying") {
+  if (sceneProgress >= 10 && babyEmotion == "crying") {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
