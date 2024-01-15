@@ -49,7 +49,8 @@ int fireY=281; //variable to animate the fire in scene 3
 
 int vomitX=340; //variables to animate the vomit of the baby in scene 8
 int vomitY=250;
-
+int tornadoX=-300; //variable to move the tornado around in the last scene
+int tornadoProgress=1; //variable to control tornado movement in the final scene
 
 void setup() {
   text = loadFont("Consolas-48.vlw");
@@ -156,24 +157,24 @@ void Story() {
   } else if (sceneNum == 8) {
     sitterX=150;
     sitterArmX=210;
-    babyX=300;
-    babyY=350;
-    babyPizzaScene();
-    sitterArmX=210;
     sitterArmY=360;
     sitterArmY2=360;
-    sitterX=150;
+    babyX=300;
+    babyY=350;
     vomitX=340;
     vomitY=250;
     momBodyX=500;
     momArmX=400;
     momArmY=232;
     dadBodyX=675;
+    babyPizzaScene();
   } else if (sceneNum == 9) {
     sitterX=150;
     sitterArmX=210;
     sitterArmY=360;
     sitterArmY2=360;
+    tornadoX=-300;
+    tornadoProgress=1;
     tornadoScene();
   }
 }
@@ -320,6 +321,9 @@ void draw() {
 
 
   if (sceneNum==2) { //animation that appears in this screen
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     parentsMad=false;
     if (sceneProgress == 1 || sceneNum==2) {
       line(450, 292, 440, 332); //left mom arm
@@ -344,6 +348,9 @@ void draw() {
 
 
   if (sceneNum==3) { //animation that appears in this scene
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="normal";
 
     if (sceneProgress >= 0 && sceneNum == 3) {
@@ -380,6 +387,9 @@ void draw() {
 
 
   if (sceneNum == 4) {  //animation that happens in scene 4
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="crying";
 
     if (sceneProgress >= 0 && babyX != -620) {
@@ -401,6 +411,9 @@ void draw() {
 
 
   if (sceneNum == 5) {
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="normal";
 
     if (sceneProgress == 0 || sceneNum == 5) {
@@ -412,6 +425,9 @@ void draw() {
   }
 
   if (sceneNum == 6) {
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="shocked";
     if (sceneProgress >= 0) {
       babyY=babyY+10;
@@ -421,6 +437,9 @@ void draw() {
   }
 
   if (sceneNum == 7) {
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="crying";
     sitterEmotion="unamused";
     if (sceneProgress >= 0) {
@@ -442,6 +461,9 @@ void draw() {
   }
 
   if (sceneNum == 8) {
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="normal";
     sitterEmotion="unamused";
     if (sceneProgress >=1) {
@@ -480,15 +502,28 @@ void draw() {
   }
 
   if (sceneNum == 9) {
+    bt5.getController("Next").hide();
+    stroke(0);
+    strokeWeight(1);
     sitterEmotion="angry";
     if (sceneProgress >=2) {
       sitterEmotion="shocked";
       sitterArmY-=10;
       sitterArmY2-=10;
 
-      sitterArmY= max (sitterArmY, 250);
-      sitterArmY2= max (sitterArmY2, 250);
-      println(sitterArmY);
+      sitterArmY2= max (sitterArmY2, 150);
+    }
+    if (sceneProgress >=3 && tornadoProgress != 2) {
+      tornadoX+=10;
+    }
+    if (tornadoX==500) {
+      tornadoProgress++;
+    }
+    if (sceneProgress >=3 && tornadoX <=500 && tornadoProgress ==2) {
+      tornadoX-=10;
+    }
+    if (tornadoX==350 && tornadoProgress ==2) {
+      tornadoProgress--;
     }
     stroke(0);
     tornadoScene();
@@ -582,7 +617,7 @@ void mouseClicked() {
     boolean xCheckSetAudio = (mouseX >= middle && mouseX <= middle+80); // x position check for Set Audio
 
 
-  (
+    (
 
 
 
@@ -713,7 +748,7 @@ void introScene() {
     text("Also try to keep the baby out of trouble....", 100, 450);
   }
 
-  if (sceneNum == 2 && sceneProgress == 5 && momBodyX>=870) {
+  if (sceneNum == 2 && sceneProgress >= 5 && momBodyX>=870) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -743,6 +778,9 @@ void introScene() {
 
     fill(0);
     text("yeah yeah whatever....", 100, 450);
+  }
+  if (sceneProgress >=6) {
+    bt5.getController("Next").show();
   }
 }
 
@@ -914,7 +952,7 @@ void babyFireSlide() {
     triangle(175, 285, 215, 285, 200, fireY);
   }
 
-  if (sceneProgress == 9 && babyX == 25) {
+  if (sceneProgress >= 9 && babyX == 25) {
     pushMatrix();
     scale(0.9);
     translate(-240, 150);
@@ -926,7 +964,7 @@ void babyFireSlide() {
     text("Wahhhh wahhhhhhh \nWAHHHHHHHHHHHHHHHHH", 100, 450);
   }
 
-  if (sceneProgress == 10 && babyEmotion == "crying") {
+  if (sceneProgress >= 10 && babyEmotion == "crying") {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -957,7 +995,7 @@ void babyFireSlide() {
     fill(0);
     text("hm, oh, you're crying... \ncan you be quiet i'm trying to order pizza", 100, 450);
   }
-  if (sceneProgress == 11) {
+  if (sceneProgress >= 11) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -987,6 +1025,9 @@ void babyFireSlide() {
 
     fill(0);
     text("Gosh, you just won't pipe down, i'm putting you in your room!", 100, 450);
+  }
+  if (sceneProgress >=11) {
+    bt5.getController("Next").show();
   }
 
   pushMatrix();
@@ -1114,6 +1155,9 @@ void babyCribScene() {
     fill(0);
     text("yeah yeah I get it....", 100, 450);
   }
+  if (sceneProgress >=3) {
+    bt5.getController("Next").show();
+  }
 }
 
 void babyCrawlScene() {
@@ -1196,7 +1240,7 @@ void babyCrawlScene() {
 
   if (sceneProgress == 0) {
     fill(0);
-    text("it seems as if the babysitter left the door open, \nallowing the baby to escape it's room", 200, 450);
+    text("it seems as if the babysitter left the door open, \nallowing the baby to escape it's room", 150, 450);
   }
 
   if (sceneProgress >= 1 && babyX == 1100) {
@@ -1210,6 +1254,9 @@ void babyCrawlScene() {
     fill(0);
 
     text("Guh, gwoohhhh", 100, 450);
+  }
+  if (sceneProgress >=2 && babyX == 1100) {
+    bt5.getController("Next").show();
   }
 }
 
@@ -1242,8 +1289,11 @@ void babyFallScene() {
   if (sceneNum >= 0) {
     fill(0);
     textSize(100);
-    text("GAHHAHDHAHGJGHAHGAHA", 0, 450);
+    text("GAHHAHDHAHGJ!!!!!!!!!!!!", 0, 450);
     textSize(20);
+  }
+  if (sceneProgress >=4) {
+    bt5.getController("Next").show();
   }
 }
 
@@ -1608,6 +1658,9 @@ void babyPizzaScene() {
     fill(0);
     text("how DARE you treat our baby like this! \nwe were watching you on the security cameras the ENTIRE time \nNOW GET OUT!!!", 100, 425);
   }
+  if (sceneProgress >=8 && momBodyX == 1200) {
+    bt5.getController("Next").show();
+  }
 }
 
 void tornadoScene() {
@@ -1639,7 +1692,11 @@ void tornadoScene() {
   translate(600, 50);
   drawSitter();
   popMatrix();
-
+  fill(103); //drawing the big bad tornado that comes by to ruin the babysitters night
+  triangle(tornadoX-20, 60, tornadoX+200, 60, tornadoX+20, 475); //funnel of the tornado
+  arc (tornadoX, -20, 250, 210, radians (55), radians(190)); //clouds that the tornado is coming out of
+  arc (tornadoX+140, -20, 300, 220, radians(0), radians(180));
+  arc(tornadoX+70, -20, 200, 230, radians(0), radians(180));
   if (sceneProgress == 1) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
@@ -1702,6 +1759,39 @@ void tornadoScene() {
 
     fill(0);
     text("Uh oh, is, is IS THAT A TORNDAO!!!", 100, 450);
+  }
+  if (sceneProgress == 4) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    textSize(50);
+    text("AHHHH!!!!", 100, 450);
+    textSize(20);
   }
 }
 
