@@ -20,7 +20,7 @@ Changes from plan:
 ControlP5 bt5;  // variable for the button controller
 SoundFile musicFile; // varible to load the sound file into and to be able to change volume globally
 PFont text; // varible so we can load in the font.
-int musicVolume; // if music should be played
+int musicVolume = 50; // if music should be played: default 50
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
 int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it adds queues for parents walking in)
 boolean isPaused = false; // if the game is currently paused
@@ -54,9 +54,9 @@ int vomitY=250;
 void setup() {
   text = loadFont("Consolas-48.vlw");
   size(800, 500);
-  musicFile = new SoundFile(this, "ruins.mp3");
+  musicFile = new SoundFile(this, "ruins.mp3"); // load the sound file from the data folder
   musicFile.loop(); // play and loop the sound file
-  musicFile.amp(0.5); // set it to it's default of 50% volume
+  musicFile.amp(musicVolume); // set it to it's default of 50% volume
 
   bt5 = new ControlP5(this);
   bt5.addButton("Next")
@@ -112,7 +112,7 @@ void Story() {
         .setPosition(width/2 - 75, height-50)
         .setSize(150, 20)
         .setRange(0, 100)
-        .setValue(50) // default volume
+        .setValue(musicVolume) // default volume
         .setColorBackground(color(0, 0, 0))
         .setColorCaptionLabel(color(20, 20, 20));
     }
@@ -307,13 +307,6 @@ void draw() {
     fill(0, 0, 0, 10); // slowly fill black
     rect(55, 55, width - 55, height - 55);
     rectMode(CORNER); // reset it back
-    if (bt5.getController("PauseExit") == null) {
-      bt5.addButton("PauseExit")
-        //  .setColorBackground(color(10, 10, 10))
-        .setPosition(250, height-150)
-        .setSize(80, 50)
-        .setCaptionLabel("Exit");
-    }
 
     return;
   }
@@ -518,14 +511,11 @@ void keyPressed() {
     if (isPaused == true) {
       isPaused = false;
       musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1
-      bt5.getController("PauseExit").remove();
       bt5.show(); // show all buttons
 
       Story(); // redraw to clear out the pause menu
     } else {
       bt5.hide(); // hide all buttons
-      musicFile.amp(0); // mute audio while paused
-
       Story();
       isPaused = true;
     }
@@ -552,7 +542,7 @@ void mouseClicked() {
   if (sceneNum == 1) { // if on main menu
     if (sceneProgress == 0) { // if instructions are NOT toggled
       int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
-      boolean yCheck =  (mouseY <= (height-75) && mouseY >= height-(75+50));
+      boolean yCheck = (mouseY <= (height-75) && mouseY >= height-(75+50));
       boolean xCheck = (mouseX >= middle && mouseX <= middle+80); // 80 is the width of the box
       if (yCheck && xCheck) { // if the user is pressing the button and not somewhere else
         bt5.hide();
@@ -568,13 +558,36 @@ void mouseClicked() {
         fill(255); // set text color to white
         text("X", 70, 85); // an X just to make it more clear
 
-
         // todo: Write instructions
       }
     } else { // instructions ARE toggled so unset.
       sceneProgress = 0; // set to "not on instructions"
       bt5.show(); // show the selection buttons again
       mainMenu(); // call it to clear the instructions
+    }
+  } else if (isPaused) {
+    int middle = (width/2) - 40; // compensate for the fact that rects draw from top corner
+
+    /* Layout
+     Button = 80px
+     Gap = 40px
+     G|P = middle of screen + gap
+     Button Gap Button G|P Button
+     */
+    boolean yCheck = (mouseY <= (height-75) && mouseY >= height/2-(75+50)); // y check for all
+
+    boolean xCheckExit = (mouseX >= middle - 240 && mouseX <= middle-120); // x position check for exit
+    boolean xCheckInstuctions = (mouseX >= middle  && mouseX <= middle+80); // x position check for Instructions
+    boolean xCheckMainMenu = (mouseX >= middle && mouseX <= middle+80); // x position check for Main Menu
+    boolean xCheckSetAudio = (mouseX >= middle && mouseX <= middle+80); // x position check for Set Audio
+
+
+  (
+
+
+
+    if (yCheck) { // if the user is pressing the button and not somewhere else
+      bt5.hide();
     }
   }
 }
