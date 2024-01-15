@@ -1,5 +1,4 @@
 import controlP5.*;
-import controlP5.BitFont;
 import processing.sound.*;
 
 /*
@@ -31,6 +30,7 @@ String sitterEmotion = "unamused"; // the emotion to draw the sitter in
 String babyEmotion = "sick"; // the emotion to draw the baby in
 float slowdown = 0; // a way to control the animation speed for certain parts of a frame
 
+
 int momArmX=400; //variables that help animate the mom and dad
 int momArmY=232;
 int momBodyX=500;
@@ -45,6 +45,7 @@ int babyX=300; //variables that animate the baby
 int babyY=350;
 
 int fireY=281; //variable to animate the fire in scene 3
+
 
 int vomitX=340; //variables to animate the vomit of the baby in scene 8
 int vomitY=250;
@@ -534,7 +535,6 @@ void draw() {
       sitterArmY2-=10;
 
       sitterArmY2= max (sitterArmY2, 150);
-      sitterArmY= max (sitterArmY, 150);
     }
     if (sceneProgress >=3 && tornadoProgress != 2) {
       tornadoX+=10;
@@ -620,8 +620,8 @@ void mouseClicked() {
         text("Press ESC or click anywhere to get out", 55, 45);
         fill(255); // set text color to white
         text("X", 70, 85); // an X just to make it more clear
-        
-        text("Welcome to this animated storybook! \nThis educational story focuses on what you shouldn't do as a babysitter by \nusing a look don't tell type of communication. \n\nIn order to progress the story click the spacebar and different lines \nof dialouge will show up. \nTo go to the next scene use the right arrow key once the scene is finished. \n you will know if the scene is finished if a button in the bottom right \nbecomes visible! \nIf you want to go back a scene use the left arrow key. \nThis can be done at anytime! \nIf you want to pause the game use the ESC function", 90, 95); 
+
+        // todo: Write instructions
       }
     } else { // instructions ARE toggled so unset.
       sceneProgress = 0; // set to "not on instructions"
@@ -996,7 +996,7 @@ void babyFireSlide() {
   drawBaby();
   popMatrix();
 
-  if (sceneProgress == 8 && babyX == 25) {
+  if (sceneProgress >= 8 && babyX == 25) {
     fill(240, 173, 27); //the fire that appears to burn the baby
     triangle(90, 285, 125, 285, 100, fireY);
     triangle(125, 285, 175, 285, 150, fireY);
@@ -1343,7 +1343,7 @@ void babyFallScene() {
     text("GAHHAHDHAHGJ!!!!!!!!!!!!", 0, 450);
     textSize(20);
   }
-  if (sceneProgress >=1) {
+  if (sceneProgress >=4) {
     bt5.getController("Next").show();
   }
 }
@@ -1478,9 +1478,6 @@ void babyPickupScene() {
 
     fill(0);
     text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 425);
-  }
-  if (sceneProgress >=4){
-    bt5.getController("Next").show();
   }
 }
 
@@ -2216,6 +2213,7 @@ void drawBaby() {
     } else if (babyEmotion=="shocked") {
       fill(252, 232, 194);
       ellipse(babyX+20, babyY-10, 40, 40); //head
+
       fill(0);
       ellipse(babyX+10, babyY-10, 10, 20); //eyes
       ellipse(babyX+30, babyY-10, 10, 20);
