@@ -1,5 +1,4 @@
 import controlP5.*;
-import processing.sound.*;
 
 /*
 Authors: Jason Cameron & Simon Michetti
@@ -10,26 +9,34 @@ Authors: Jason Cameron & Simon Michetti
 
 
 /*
+todos:
+ - look into slider for playMusic (p5 slider)
+ - update the line "    if ((sceneNum == 8 || sceneNum == 8) && sceneProgress == 0) {" with the the second scene num or simply remove.
+ - check the users username for bad chars
+ */
+
+
+
+
+/*
 Changes from plan:
  - drawRain & drawFire being changed from global varibles to methods
- - renamed slowdownOne to slowdown and removed slowdownTwo
- - renamed playMusic to musicVolume and added musicFile.
  */
 
 
 ControlP5 bt5;  // variable for the button controller
-SoundFile musicFile; // varible to load the sound file into and to be able to change volume globally
-PFont text; // varible so we can load in the font.
-int musicVolume = 50; // if music should be played: default 50
+int musicVolume; // if music should be played
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
-int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it adds queues for parents walking in)
 boolean isPaused = false; // if the game is currently paused
 String username = "testing"; // the user's username
 boolean parentsMad = false; // whether to draw the parents as mad or not
 String sitterEmotion = "unamused"; // the emotion to draw the sitter in
 String babyEmotion = "sick"; // the emotion to draw the baby in
-float slowdown = 0; // a way to control the animation speed for certain parts of a frame
+float slowdownTwo = 0; // a way to control the animation speed for certain parts of a frame
+int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it adds queues for parents walking in)
+PFont text;
 
+float slowdownOne = 0; // a way to control the animation speed for one part of a frame
 
 int momArmX=400; //variables that help animate the mom and dad
 int momArmY=232;
@@ -50,14 +57,12 @@ int fireY=281; //variable to animate the fire in scene 3
 int vomitX=340; //variables to animate the vomit of the baby in scene 8
 int vomitY=250;
 
+int tornadoX=-300; //variable to move the tornado around in the last scene
+int tornadoProgress=1; //variable to control tornado movement in the final scene
 
 void setup() {
   text = loadFont("Consolas-48.vlw");
   size(800, 500);
-  musicFile = new SoundFile(this, "ruins.mp3"); // load the sound file from the data folder
-  musicFile.loop(); // play and loop the sound file
-  musicFile.amp(musicVolume); // set it to it's default of 50% volume
-
   bt5 = new ControlP5(this);
   bt5.addButton("Next")
     .setBroadcast(false)
@@ -94,17 +99,11 @@ void Story() {
       bt5.addButton("SetUsername")
         .setColorBackground(color(0, 0, 0))
         .setPosition(middle - 190, height-125)
-        .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
-        .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
-        .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
         .setSize(80, 50);
 
       bt5.addButton("Exit")
         .setColorBackground(color(0, 0, 0))
         .setPosition(middle + 190, height-125)
-        .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
-        .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
-        .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
         .setSize(80, 50);
 
 
@@ -112,9 +111,12 @@ void Story() {
         .setPosition(width/2 - 75, height-50)
         .setSize(150, 20)
         .setRange(0, 100)
-        .setValue(musicVolume) // default volume
+        .setValue(20) // default volume
         .setColorBackground(color(0, 0, 0))
         .setColorCaptionLabel(color(20, 20, 20));
+
+
+      println(width/2);
     }
     mainMenu();
   } else if (sceneNum == 2) {
@@ -156,24 +158,24 @@ void Story() {
   } else if (sceneNum == 8) {
     sitterX=150;
     sitterArmX=210;
-    babyX=300;
-    babyY=350;
-    babyPizzaScene();
-    sitterArmX=210;
     sitterArmY=360;
     sitterArmY2=360;
-    sitterX=150;
+    babyX=300;
+    babyY=350;
     vomitX=340;
     vomitY=250;
     momBodyX=500;
     momArmX=400;
     momArmY=232;
     dadBodyX=675;
+    babyPizzaScene();
   } else if (sceneNum == 9) {
     sitterX=150;
     sitterArmX=210;
     sitterArmY=360;
     sitterArmY2=360;
+    tornadoX=-300;
+    tornadoProgress=1;
     tornadoScene();
   }
 }
@@ -181,9 +183,7 @@ void Story() {
 
 void Next() {
   println("next!!!!!!!!!!");
-  if (sceneNum == 1 && sceneProgress == 1) { // don't skin while in instructions
-    return;
-  }
+  println(sceneNum);
   sceneProgress = 0;
   boolean goNext = true;
   if (sceneNum == 0 && bt5.getController("Prev") == null ) {
@@ -218,9 +218,6 @@ void Next() {
   }
 }
 void Prev() {
-  if (sceneNum == 1 && sceneProgress == 1) { // don't skin while in instructions
-    return;
-  }
   sceneProgress = 0;
   sceneNum = max(0, sceneNum - 1); // ensure it cannot go below zero
   if (!bt5.getController("Next").isVisible()) {
@@ -243,32 +240,25 @@ void mainMenu() {
   splashScreen();
 
   fill(0, 0, 0);
-  noStroke();
   int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
   rect(middle, height-125, 80, 50);
   //  text("Instructions", (width/2), height-(125 + (50/2)));
-  if (bt5.getController("Instructions") == null) { // only add it if it doest already exist
-    bt5.addTextlabel("Instructions")
-      .setText("Instructions")
-      .setPosition(middle + 10, height-(125 - (50/2) + 5))
-
-      .setColorValue(0xffffff00);
-  }
+  bt5.addTextlabel("Instructions")
+    .setText("Instructions")
+    .setPosition(middle + 20, height-(125 + (50/2)))
+    .setColorValue(0xffffff00);
 }
 
 void SetUsername() {
   while (true) {
-    String tempusername = getString("Please enter a username (3-15chars)");
+    String tempusername = getString("Please enter a username (5-20chars)");
     if (tempusername == null) {
       continue;
     }
-    if (tempusername.length() > 15) { // if the username is greater than 15 chars
-      JOptionPane.showMessageDialog(null, "the max length is 15 chars, you tried to set it to: " + str(tempusername.length()));
-    } else if (tempusername.length() < 3) { // if the username is less than 3 chars
-
+    if (tempusername.length() > 20) {
+      JOptionPane.showMessageDialog(null, "the max length is 20 chars, you tried to set it to: " + str(tempusername.length()));
+    } else if (tempusername.length() < 3) {// todo add content filtering
       JOptionPane.showMessageDialog(null, "the min length is 3 chars, you tried to set it to: " + str(tempusername.length()));
-    } else if (!tempusername.matches("\\p{Alpha}*")) { // if the username does not only contain letters.
-      JOptionPane.showMessageDialog(null, "Your username cannot contain non letters. Please try again.");
     } else {
       username = tempusername;
       break;
@@ -292,26 +282,38 @@ void drawRain() {
 
 
 void draw() {
-  if (sceneNum == 1 || isPaused) {
-    musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1 and we want to provide live updates
-  }
-  //if (sceneNum == 1 && sceneProgress == 1) { // if on main menu and is on instructions
-  //  print("hi");
-  //  bt5.hide(); // hide all controllers
-  //  bt5.getController("Next").hide();
-  //  bt5.getController("Prev").hide();
-  //}
-
   if (isPaused == true) {
     rectMode(CORNERS);
     fill(0, 0, 0, 10); // slowly fill black
     rect(55, 55, width - 55, height - 55);
     rectMode(CORNER); // reset it back
+    if (bt5.getController("PauseExit") == null) {
+      bt5.addButton("PauseExit")
+        //  .setColorBackground(color(10, 10, 10))
+        .setPosition(250, height-150)
+        .setSize(80, 50)
+        .setCaptionLabel("Exit");
+    }
 
     return;
   }
-  slowdown++;
-  if (slowdown % 8 == 0) { // runs at 1/8th of the speed that draw does
+
+
+  if (sceneProgress==1) {// if instructions is toggled on main menu
+    rectMode(CORNERS);
+    fill(0, 0, 0, 15); // quicklyish fill black
+    rect(55, 55, width - 55, height - 55);
+    rectMode(CORNER); // reset it back
+  } else {
+    splashScreen(); // continusly redraw bg unless if it's toggled
+  }
+
+
+  slowdownOne++;
+  slowdownTwo++;
+  if (slowdownOne % 12 == 0) {
+  } // runs at 1/12th of the speed that draw does
+  if (slowdownTwo % 8 == 0) { // runs at 1/8th of the speed that draw does
     if ((sceneNum == 9) && sceneProgress >= 0) {
 
       drawRain();
@@ -319,7 +321,12 @@ void draw() {
   }
 
 
+
+
   if (sceneNum==2) { //animation that appears in this screen
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     parentsMad=false;
     if (sceneProgress == 1 || sceneNum==2) {
       line(450, 292, 440, 332); //left mom arm
@@ -344,6 +351,9 @@ void draw() {
 
 
   if (sceneNum==3) { //animation that appears in this scene
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="normal";
 
     if (sceneProgress >= 0 && sceneNum == 3) {
@@ -380,6 +390,9 @@ void draw() {
 
 
   if (sceneNum == 4) {  //animation that happens in scene 4
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="crying";
 
     if (sceneProgress >= 0 && babyX != -620) {
@@ -401,6 +414,9 @@ void draw() {
 
 
   if (sceneNum == 5) {
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="normal";
 
     if (sceneProgress == 0 || sceneNum == 5) {
@@ -411,7 +427,10 @@ void draw() {
     babyCrawlScene();
   }
 
-  if (sceneNum == 6) {
+  if (sceneNum == 6) { 
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="shocked";
     if (sceneProgress >= 0) {
       babyY=babyY+10;
@@ -421,6 +440,9 @@ void draw() {
   }
 
   if (sceneNum == 7) {
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="crying";
     sitterEmotion="unamused";
     if (sceneProgress >= 0) {
@@ -442,6 +464,9 @@ void draw() {
   }
 
   if (sceneNum == 8) {
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     babyEmotion="normal";
     sitterEmotion="unamused";
     if (sceneProgress >=1) {
@@ -480,16 +505,31 @@ void draw() {
   }
 
   if (sceneNum == 9) {
+    bt5.getController("Next").setVisible(false);
+    stroke(0);
+    strokeWeight(1);
     sitterEmotion="angry";
     if (sceneProgress >=2) {
       sitterEmotion="shocked";
       sitterArmY-=10;
       sitterArmY2-=10;
 
-      sitterArmY= max (sitterArmY, 250);
-      sitterArmY2= max (sitterArmY2, 250);
-      println(sitterArmY);
+      sitterArmY= max (sitterArmY, 150);
+      sitterArmY2= max (sitterArmY2, 150);
     }
+    if (sceneProgress >=3 && tornadoProgress != 2) {
+      tornadoX+=10;
+    }
+    if (tornadoX==500) {
+      tornadoProgress++;
+    }
+    if (sceneProgress >=3 && tornadoX <=500 && tornadoProgress ==2) {
+      tornadoX-=10;
+    }
+    if (tornadoX==350 && tornadoProgress ==2) {
+      tornadoProgress--;
+    }
+
     stroke(0);
     tornadoScene();
     drawRain();
@@ -498,24 +538,20 @@ void draw() {
 
 void keyPressed() {
   if (key == ESC) {
-    if (sceneNum == 1 && sceneProgress == 1) { // if on instructions in main menu
-      sceneProgress = 0;
-      bt5.show();
-      mainMenu();
-    }
     if (sceneNum <= 1) { // don't pause on main menu or splash screen
-      key = 0; // reset key so it doesnt exit
+      key = 0; // reset key
       return;
     }
 
     if (isPaused == true) {
       isPaused = false;
-      musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1
+      bt5.getController("PauseExit").remove();
       bt5.show(); // show all buttons
 
       Story(); // redraw to clear out the pause menu
     } else {
       bt5.hide(); // hide all buttons
+
       Story();
       isPaused = true;
     }
@@ -527,67 +563,28 @@ void keyPressed() {
   } else if ( key == ' ') { // if user just clicked space
 
 
-    //  if (sceneNum >= 2) {
-    sceneProgress ++;
-    println(sceneProgress);
-    //}
+    if (isPaused == false) {
+      print("space clicked");
+      //  if (sceneNum >= 2) {
+      sceneProgress ++;
+      println(sceneProgress);
+      //}
+    }
   }
 }
-
 
 void mouseClicked() {
   /*
   I needed to make Instructions this way due to the fact that if didn't plan for an instructions method and if I handled it annother way (such is bt5.getController("Instructions").isMouseClicked()) in draw, it would never be consistant.
    */
-  if (sceneNum == 1) { // if on main menu
-    if (sceneProgress == 0) { // if instructions are NOT toggled
-      int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
-      boolean yCheck = (mouseY <= (height-75) && mouseY >= height-(75+50));
-      boolean xCheck = (mouseX >= middle && mouseX <= middle+80); // 80 is the width of the box
-      if (yCheck && xCheck) { // if the user is pressing the button and not somewhere else
-        bt5.hide();
-
-        sceneProgress = 1; // so that other controllers can check.
-        rectMode(CORNERS);
-        noStroke(); // dont do red outline
-        fill(0, 0, 0); // quicklyish fill black
-        rect(55, 55, width - 55, height - 55);
-        rectMode(CORNER); // reset it back
-
-        text("Press ESC or click anywhere to get out", 55, 45);
-        fill(255); // set text color to white
-        text("X", 70, 85); // an X just to make it more clear
-
-        // todo: Write instructions
-      }
-    } else { // instructions ARE toggled so unset.
-      sceneProgress = 0; // set to "not on instructions"
-      bt5.show(); // show the selection buttons again
-      mainMenu(); // call it to clear the instructions
-    }
-  } else if (isPaused) {
-    int middle = (width/2) - 40; // compensate for the fact that rects draw from top corner
-
-    /* Layout
-     Button = 80px
-     Gap = 40px
-     G|P = middle of screen + gap
-     Button Gap Button G|P Button
-     */
-    boolean yCheck = (mouseY <= (height-75) && mouseY >= height/2-(75+50)); // y check for all
-
-    boolean xCheckExit = (mouseX >= middle - 240 && mouseX <= middle-120); // x position check for exit
-    boolean xCheckInstuctions = (mouseX >= middle  && mouseX <= middle+80); // x position check for Instructions
-    boolean xCheckMainMenu = (mouseX >= middle && mouseX <= middle+80); // x position check for Main Menu
-    boolean xCheckSetAudio = (mouseX >= middle && mouseX <= middle+80); // x position check for Set Audio
-
-
-  (
-
-
-
-    if (yCheck) { // if the user is pressing the button and not somewhere else
-      bt5.hide();
+  if (sceneNum == 1 && sceneProgress == 0) { // if on main menu
+    boolean yCheck =  (mouseY <= (height-75) && mouseY >= height-(75+50));
+    boolean xCheck = (mouseX <= (width/2)-25 && mouseX >= (width/2)+25);
+    println(yCheck);
+    println(xCheck);
+    println("result:");
+    if (yCheck && xCheck) {
+      println("BOTH!");
     }
   }
 }
@@ -713,7 +710,7 @@ void introScene() {
     text("Also try to keep the baby out of trouble....", 100, 450);
   }
 
-  if (sceneNum == 2 && sceneProgress == 5 && momBodyX>=870) {
+  if (sceneNum == 2 && sceneProgress >= 5 && momBodyX>=870) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -743,6 +740,9 @@ void introScene() {
 
     fill(0);
     text("yeah yeah whatever....", 100, 450);
+  }
+  if (sceneProgress >=6){
+   bt5.getController("Next").setVisible(true); 
   }
 }
 
@@ -914,7 +914,7 @@ void babyFireSlide() {
     triangle(175, 285, 215, 285, 200, fireY);
   }
 
-  if (sceneProgress == 9 && babyX == 25) {
+  if (sceneProgress >= 9 && babyX == 25) {
     pushMatrix();
     scale(0.9);
     translate(-240, 150);
@@ -926,7 +926,7 @@ void babyFireSlide() {
     text("Wahhhh wahhhhhhh \nWAHHHHHHHHHHHHHHHHH", 100, 450);
   }
 
-  if (sceneProgress == 10 && babyEmotion == "crying") {
+  if (sceneProgress >= 10 && babyEmotion == "crying") {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -957,7 +957,7 @@ void babyFireSlide() {
     fill(0);
     text("hm, oh, you're crying... \ncan you be quiet i'm trying to order pizza", 100, 450);
   }
-  if (sceneProgress == 11) {
+  if (sceneProgress >= 11) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -987,6 +987,9 @@ void babyFireSlide() {
 
     fill(0);
     text("Gosh, you just won't pipe down, i'm putting you in your room!", 100, 450);
+  }
+  if (sceneProgress >=11){
+   bt5.getController("Next").setVisible(true);  
   }
 
   pushMatrix();
@@ -1114,6 +1117,9 @@ void babyCribScene() {
     fill(0);
     text("yeah yeah I get it....", 100, 450);
   }
+  if (sceneProgress >=3){
+   bt5.getController("Next").setVisible(true);  
+  }
 }
 
 void babyCrawlScene() {
@@ -1196,7 +1202,7 @@ void babyCrawlScene() {
 
   if (sceneProgress == 0) {
     fill(0);
-    text("it seems as if the babysitter left the door open, \nallowing the baby to escape it's room", 200, 450);
+    text("it seems as if the babysitter left the door open, \nallowing the baby to escape it's room", 150, 450);
   }
 
   if (sceneProgress >= 1 && babyX == 1100) {
@@ -1211,6 +1217,9 @@ void babyCrawlScene() {
 
     text("Guh, gwoohhhh", 100, 450);
   }
+  if (sceneProgress >=2 && babyX == 1100){
+    bt5.getController("Next").setVisible(true); 
+  }   
 }
 
 void babyFallScene() {
@@ -1242,8 +1251,11 @@ void babyFallScene() {
   if (sceneNum >= 0) {
     fill(0);
     textSize(100);
-    text("GAHHAHDHAHGJGHAHGAHA", 0, 450);
+    text("GAHHAHDHAHGJ!!!!!!!!!!!!", 0, 450);
     textSize(20);
+  }
+  if (babyY>=750){
+   bt5.getController("Next").setVisible(true);  
   }
 }
 
@@ -1377,6 +1389,9 @@ void babyPickupScene() {
 
     fill(0);
     text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 425);
+  }
+  if (sceneProgress >=4){
+   bt5.getController("Next").setVisible(true);  
   }
 }
 
@@ -1608,6 +1623,9 @@ void babyPizzaScene() {
     fill(0);
     text("how DARE you treat our baby like this! \nwe were watching you on the security cameras the ENTIRE time \nNOW GET OUT!!!", 100, 425);
   }
+  if (sceneProgress >=8 && momBodyX == 1200){
+   bt5.getController("Next").setVisible(true);  
+  }
 }
 
 void tornadoScene() {
@@ -1639,6 +1657,12 @@ void tornadoScene() {
   translate(600, 50);
   drawSitter();
   popMatrix();
+
+  fill(103); //drawing the big bad tornado that comes by to ruin the babysitters night
+  triangle(tornadoX-20, 60, tornadoX+200, 60, tornadoX+20, 475); //funnel of the tornado
+  arc (tornadoX, -20, 250, 210, radians (55), radians(190)); //clouds that the tornado is coming out of
+  arc (tornadoX+140, -20, 300, 220, radians(0), radians(180));
+  arc(tornadoX+70, -20, 200, 230, radians(0), radians(180));
 
   if (sceneProgress == 1) {
     pushMatrix(); //little icon to show speech
@@ -1703,6 +1727,39 @@ void tornadoScene() {
     fill(0);
     text("Uh oh, is, is IS THAT A TORNDAO!!!", 100, 450);
   }
+  if (sceneProgress == 4) {
+    pushMatrix(); //little icon to show speech
+    scale(0.4);
+    translate(0, 900);
+    fill(252, 232, 194); //head
+    ellipse(150, 200, 80, 80);
+    fill(147, 105, 70);
+
+    int hairY=200;
+    beginShape(); //hair
+    vertex(100, hairY);
+    vertex(135, hairY-10);
+    vertex(135, hairY-15);
+    vertex(165, hairY-15);
+    vertex(165, hairY-10);
+    vertex(200, hairY);
+    vertex(190, hairY-30);
+    vertex(200, hairY-60);
+    vertex(175, hairY-60);
+    vertex(175, hairY-70);
+    vertex(125, hairY-70);
+    vertex(125, hairY-60);
+    vertex(100, hairY-60);
+    vertex(110, hairY-30);
+    vertex(100, hairY);
+    endShape(CLOSE);
+    popMatrix();
+
+    fill(0);
+    textSize(50);
+    text("AHHHH!!!!", 100, 450);
+    textSize(20);
+  }
 }
 
 
@@ -1711,6 +1768,9 @@ void splashScreen() {
   babyEmotion = "sick";
   parentsMad=true;
   sitterEmotion="unamused";
+
+
+
 
   background(252, 229, 205); // beige bc
   fill(102, 0, 0);
@@ -1747,12 +1807,14 @@ void splashScreen() {
   vertex(756, 233);
   vertex(776, 198);
   vertex(800, 130);
+
   vertex(800, 800);
   vertex(0, 800);
 
   endShape(CLOSE);
 
   fill(246, 178, 107);
+
   beginShape();
   vertex(0, 220);
   vertex(20, 310);
