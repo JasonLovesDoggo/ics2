@@ -24,7 +24,7 @@ int musicVolume = 50; // if music should be played: default 50
 int sceneNum = 0; // the current scene that the story is on (0-10) (0 being splash 10 being tornado)
 int sceneProgress = 0; // the current part of the scene (e.g. 0 is normal but it adds queues for parents walking in)
 boolean isPaused = false; // if the game is currently paused
-String username = "testing"; // the user's username
+String username = ""; // the user's username
 boolean parentsMad = false; // whether to draw the parents as mad or not
 String sitterEmotion = "unamused"; // the emotion to draw the sitter in
 String babyEmotion = "sick"; // the emotion to draw the baby in
@@ -46,7 +46,6 @@ int babyY=350;
 
 int fireY=281; //variable to animate the fire in scene 3
 
-
 int vomitX=340; //variables to animate the vomit of the baby in scene 8
 int vomitY=250;
 int tornadoX=-300; //variable to move the tornado around in the last scene
@@ -57,7 +56,7 @@ void setup() {
   size(800, 500);
   musicFile = new SoundFile(this, "ruins.mp3"); // load the sound file from the data folder
   musicFile.loop(); // play and loop the sound file
-  musicFile.amp(musicVolume / 100); // set it to it's default of 50% volume
+  musicFile.amp(0.5); // set it to it's default of 50% volume
 
   bt5 = new ControlP5(this);
   bt5.addButton("Next")
@@ -74,8 +73,25 @@ void setup() {
   Story();
 }
 
+void SkipScenes(int theChoice) {
+  if (mouseX > 140 && mouseY > height-170 ) {
+    return; // fixes a bug where it constantly tries to call this even though there is no username selected
+  }
+  if (username == "") {
+    JOptionPane.showMessageDialog(null, "You must set a username in order to play");
+    return;
+  }
+  if (bt5.getController("SetUsername") != null) {
+    bt5.getController("SetUsername").remove();
+    bt5.getController("Exit").remove();
+    bt5.getController("Instructions").remove();
+    bt5.getController("musicVolume").remove();
+  }
+  bt5.remove("SkipScenes"); // radio is not 1 controller
 
-
+  sceneNum = theChoice;
+  Story();
+}
 
 void Story() {
   print("Going to: " + sceneNum);
@@ -94,6 +110,7 @@ void Story() {
         .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
         .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
         .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
+        .setCaptionLabel("SET USERNAME") // give it a space
         .setSize(80, 50);
 
       bt5.addButton("Exit")
@@ -111,8 +128,36 @@ void Story() {
         .setRange(0, 100)
         .setValue(musicVolume) // default volume
         .setColorBackground(color(0, 0, 0))
-        .setColorCaptionLabel(color(20, 20, 20));
+        .setColorCaptionLabel(color(20, 20, 20))
+        .setColorActive(color(140, 0, 0))   // set the hover color to a lighter red
+        .setColorForeground(color(120, 0, 0));      // Set normal color to the red
     }
+    //String promoteTo; illigal code :pensive:
+    //do {
+    //    promoteTo = (String) JOptionPane.showInputDialog(null,
+    //        "Select a scene to skip to:", "Scene Selector",
+    //        JOptionPane.QUESTION_MESSAGE, null,
+    //        new String[] {"IntroScene", "Main Menu");
+    //} while (promoteTo == null);
+
+    bt5.addRadioButton("SkipScenes")
+      .setPosition(20, height - (17 * 8)) // 8 options
+      .setItemWidth(20) // Adjust the width as needed
+      .setItemHeight(15)
+      .addItem("Next Scene", 2) // 1st option is scene name 2nd is scene num
+      .addItem("Baby Fire Slide", 3)
+      .addItem("Baby Crib Scene", 4)
+      .addItem("Baby Crawl Scene", 5)
+      .addItem("Baby Fall Scene", 6)
+      .addItem("Baby Pickup Scene", 7)
+      .addItem("Baby Pizza Scene", 8)
+      .addItem("Tornado Scene", 9)
+      .setColorLabel(color(0)) // set text to black
+      .setColorBackground(color(0)) // set bg to background
+      .setColorActive(color(102, 0, 0))      // Set selected color to the red
+      .setColorForeground(color(140, 0, 0));   // set the hover color to ligher red
+
+    bt5.getController("Next").show();
     mainMenu();
   } else if (sceneNum == 2) {
     momBodyX=500;
@@ -201,12 +246,13 @@ void Next() {
     if (username == "") { // block continue if username has not been set
       JOptionPane.showMessageDialog(null, "You must set a username in order to play");
       goNext = false;
-      mainMenu();
+    } else { // fixes bug if username isnt set
+      bt5.getController("SetUsername").remove();
+      bt5.getController("Exit").remove();
+      bt5.getController("Instructions").remove();
+      bt5.getController("musicVolume").remove();
+      bt5.remove("SkipScenes"); // radio is not 1 controller
     }
-    bt5.getController("SetUsername").remove();
-    bt5.getController("Exit").remove();
-    bt5.getController("Instructions").remove();
-    bt5.getController("musicVolume").remove();
   }
 
   if (goNext == true) {
@@ -230,6 +276,7 @@ void Prev() {
       bt5.getController("Prev").remove();
       bt5.getController("Instructions").remove();
       bt5.getController("musicVolume").remove();
+      bt5.remove("SkipScenes"); // radio is not 1 controller
     }
   }
   Story();
@@ -247,20 +294,19 @@ void mainMenu() {
   //  text("Instructions", (width/2), height-(125 + (50/2)));
   if (bt5.getController("Instructions") == null) { // only add it if it doest already exist
     bt5.addTextlabel("Instructions")
-      .setText("Instructions")
-      .setPosition(middle + 10, height-(125 - (50/2) + 5))
-
-      .setColorValue(0xffffff00);
+      .setText("INSTRUCTIONS")
+      .setPosition(middle + 4, height-(125 - (50/2) + 5));
   }
 }
 
 void SetUsername() {
   while (true) {
-    String tempusername = getString("Please enter a username (3-15chars)");
+    String tempusername = getString("Please enter a username (3-15chars) or the word 'stop' to break out of the loop");
     if (tempusername == null) {
       continue;
-    }
-    if (tempusername.length() > 15) { // if the username is greater than 15 chars
+    } else if (tempusername.toLowerCase().equals("stop")) { // allow user to break out of loop, for some reason it doesnt work with ==
+      return;
+    } else if (tempusername.length() > 15) { // if the username is greater than 15 chars
       JOptionPane.showMessageDialog(null, "the max length is 15 chars, you tried to set it to: " + str(tempusername.length()));
     } else if (tempusername.length() < 3) { // if the username is less than 3 chars
 
@@ -290,9 +336,6 @@ void drawRain() {
 
 
 void draw() {
-  if (sceneNum == 1 || isPaused) {
-    musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1 and we want to provide live updates
-  }
   //if (sceneNum == 1 && sceneProgress == 1) { // if on main menu and is on instructions
   //  print("hi");
   //  bt5.hide(); // hide all controllers
@@ -300,7 +343,7 @@ void draw() {
   //  bt5.getController("Prev").hide();
   //}
 
-  if (isPaused == true) {
+  if (isPaused == true && slowdown != -1) {
     /*
     I need to do custom buttons for this as there is a bug where controlp5 only
      */
@@ -330,227 +373,235 @@ void draw() {
     text("Main Menu", (spacing * 4) - 1, Ymiddle);
     textSize(13);
     text("Instructions", (spacing * 2) - 1, Ymiddle);
-    textSize(20); // reset font to norm
+    textSize(16);
+    fill(255);
+    text("Press ESC or click anywhere besides the buttons to continue", 65, 75);
+    textAlign(CENTER);
+    text("The Bad Babysitter: By Jason Cameron & Simon Michetti Studios", width/2, height/2 - 70);
+    textSize(20); // reset font to normal
+    textAlign(LEFT); // reset to norm
     return;
   }
-  slowdown++;
+  if (slowdown != -1) {
+    slowdown++;
+  }
   if (slowdown % 8 == 0) { // runs at 1/8th of the speed that draw does
     if ((sceneNum == 9) && sceneProgress >= 0) {
 
       drawRain();
     }
   }
-
-
-  if (sceneNum==2) { //animation that appears in this screen
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    parentsMad=false;
-    if (sceneProgress == 1 || sceneNum==2) {
-      line(450, 292, 440, 332); //left mom arm
-      line(440, 332, momArmX+40, momArmY+150);
-      momArmX=momArmX-5;  //animation to raise the moms arm in a greeting/acknoledgement of departure
-      momArmY=momArmY-5;
-      momArmY = max(momArmY, 132);
-      momArmX = max(momArmX, 380);
-    }
-    if (sceneProgress >= 4 || sceneProgress >=10) {
-      momArmX=momArmX+15;
-      momArmX = min(momArmX, 100000);
-      momBodyX=momBodyX+10;  //showing the parents leave the scene
-      dadBodyX=dadBodyX+10;
-    }
-    if (sceneProgress >= 6 || sceneProgress >=10) {
-      sitterX= sitterX-10; //showing the babysitter leave the scene
-      sitterArmX= sitterArmX-10;
-    }
-    introScene();
-  }
-
-
-  if (sceneNum==3) { //animation that appears in this scene
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    babyEmotion="normal";
-
-    if (sceneProgress >= 0 && sceneNum == 3) {
-      sitterX=sitterX-10; //showing the babysitter slide into the scene as if he was coming from the last one.
-      sitterArmX=sitterArmX-10;
-      sitterX = max (sitterX, -260);
-      sitterArmX = max (sitterArmX, -200);
+  if (slowdown != -1) {
+    if (sceneNum==2) { //animation that appears in this screen
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      parentsMad=false;
+      if (sceneProgress == 1 || sceneNum==2) {
+        line(450, 292, 440, 332); //left mom arm
+        line(440, 332, momArmX+40, momArmY+150);
+        momArmX=momArmX-5;  //animation to raise the moms arm in a greeting/acknoledgement of departure
+        momArmY=momArmY-5;
+        momArmY = max(momArmY, 132);
+        momArmX = max(momArmX, 380);
+      }
+      if (sceneProgress >= 4 || sceneProgress >=10) {
+        momArmX=momArmX+15;
+        momArmX = min(momArmX, 100000);
+        momBodyX=momBodyX+10;  //showing the parents leave the scene
+        dadBodyX=dadBodyX+10;
+      }
+      if (sceneProgress >= 6 || sceneProgress >=10) {
+        sitterX= sitterX-10; //showing the babysitter leave the scene
+        sitterArmX= sitterArmX-10;
+      }
+      introScene();
     }
 
-    if (sceneProgress >= 5) {
-      line(sitterX+60, 300, sitterArmX, sitterArmY); // right babysitter arm moving to take his phone out of his pocket
-      sitterArmX=sitterArmX+5;
-      sitterArmY=sitterArmY-5;
-      sitterArmX= max (sitterArmX, -190);
-      sitterArmY= max (sitterArmY, 250);
-    }
-    if (sceneProgress >= 7) {
-      babyX=babyX-5; //the baby sliding over to the stove which will then catch on fire
-      babyX= max (babyX, 25);
-    }
-    if (sceneProgress >=8 && babyX==25) {
-      fireY=fireY-7;  //the fire on the stove turning on and burning the baby
-      fireY = max (fireY, 250);
-    }
-    if (fireY==250) {
-      fireY+=20;
-    }
 
-    if (sceneProgress >= 9 && fireY>=250 && babyX == 25) {
-      babyEmotion = "crying"; //showing how the baby is now crying because of the fire
-    }
-    babyFireSlide();
-  }
+    if (sceneNum==3) { //animation that appears in this scene
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      babyEmotion="normal";
 
+      if (sceneProgress >= 0 && sceneNum == 3) {
+        sitterX=sitterX-10; //showing the babysitter slide into the scene as if he was coming from the last one.
+        sitterArmX=sitterArmX-10;
+        sitterX = max (sitterX, -260);
+        sitterArmX = max (sitterArmX, -200);
+      }
 
-  if (sceneNum == 4) {  //animation that happens in scene 4
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    babyEmotion="crying";
+      if (sceneProgress >= 5) {
+        line(sitterX+60, 300, sitterArmX, sitterArmY); // right babysitter arm moving to take his phone out of his pocket
+        sitterArmX=sitterArmX+5;
+        sitterArmY=sitterArmY-5;
+        sitterArmX= max (sitterArmX, -190);
+        sitterArmY= max (sitterArmY, 250);
+      }
+      if (sceneProgress >= 7) {
+        babyX=babyX-5; //the baby sliding over to the stove which will then catch on fire
+        babyX= max (babyX, 25);
+      }
+      if (sceneProgress >=8 && babyX==25) {
+        fireY=fireY-7;  //the fire on the stove turning on and burning the baby
+        fireY = max (fireY, 250);
+      }
+      if (fireY==250) {
+        fireY+=20;
+      }
 
-    if (sceneProgress >= 0 && babyX != -620) {
-      sitterX=sitterX-10;
-      sitterArmX=sitterArmX-10;
-      sitterX= max (sitterX, -500);
-      sitterArmX= max (sitterArmX, -440);
-
-      babyX= babyX-10;
-      babyX= max(babyX, -620);
+      if (sceneProgress >= 9 && fireY>=250 && babyX == 25) {
+        babyEmotion = "crying"; //showing how the baby is now crying because of the fire
+      }
+      babyFireSlide();
     }
 
-    if (sceneProgress >=1 && sceneNum == 4 && babyX <=-620) {
-      sitterX=sitterX+10;
-      sitterArmX=sitterArmX+10;
-    }
-    babyCribScene();
-  }
 
+    if (sceneNum == 4) {  //animation that happens in scene 4
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      babyEmotion="crying";
 
-  if (sceneNum == 5) {
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    babyEmotion="normal";
+      if (sceneProgress >= 0 && babyX != -620) {
+        sitterX=sitterX-10;
+        sitterArmX=sitterArmX-10;
+        sitterX= max (sitterX, -500);
+        sitterArmX= max (sitterArmX, -440);
 
-    if (sceneProgress == 0 || sceneNum == 5) {
-      babyX=babyX+10;
-      babyX= min (babyX, 1100);
-    }
+        babyX= babyX-10;
+        babyX= max(babyX, -620);
+      }
 
-    babyCrawlScene();
-  }
-
-  if (sceneNum == 6) {
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    babyEmotion="shocked";
-    if (sceneProgress >= 0) {
-      babyY=babyY+10;
+      if (sceneProgress >=1 && sceneNum == 4 && babyX <=-620) {
+        sitterX=sitterX+10;
+        sitterArmX=sitterArmX+10;
+      }
+      babyCribScene();
     }
 
-    babyFallScene();
-  }
 
-  if (sceneNum == 7) {
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    babyEmotion="crying";
-    sitterEmotion="unamused";
-    if (sceneProgress >= 0) {
-      babyX=babyX+10;
-      babyY=babyY+5;
-      sitterX=sitterX-10;
-      sitterArmX=sitterArmX-10;
+    if (sceneNum == 5) {
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      babyEmotion="normal";
 
+      if (sceneProgress == 0 || sceneNum == 5) {
+        babyX=babyX+10;
+        babyX= min (babyX, 1100);
+      }
 
-      sitterArmX= max (sitterArmX, -210);
-      sitterX = max (sitterX, -270);
-      babyY= min (babyY, 525);
-      babyX= min (babyX, 650);
+      babyCrawlScene();
     }
-    if (sceneProgress >=1 && babyX==650) {
-      babyX-=20;
-    }
-    babyPickupScene();
-  }
 
-  if (sceneNum == 8) {
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    babyEmotion="normal";
-    sitterEmotion="unamused";
-    if (sceneProgress >=1) {
-      babyX-=5;
+    if (sceneNum == 6) {
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      babyEmotion="shocked";
+      if (sceneProgress >= 0) {
+        babyY=babyY+10;
+      }
 
-      babyX = max (babyX, 100);
+      babyFallScene();
     }
-    if (sceneProgress >= 2 && babyX == 100) {
-      babyEmotion="sick";
+
+    if (sceneNum == 7) {
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      babyEmotion="crying";
+      sitterEmotion="unamused";
+      if (sceneProgress >= 0) {
+        babyX=babyX+10;
+        babyY=babyY+5;
+        sitterX=sitterX-10;
+        sitterArmX=sitterArmX-10;
+
+
+        sitterArmX= max (sitterArmX, -210);
+        sitterX = max (sitterX, -270);
+        babyY= min (babyY, 525);
+        babyX= min (babyX, 650);
+      }
+      if (sceneProgress >=1 && babyX==650) {
+        babyX-=20;
+      }
+      babyPickupScene();
     }
-    if (sceneProgress >=3) {
+
+    if (sceneNum == 8) {
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
+      babyEmotion="normal";
+      sitterEmotion="unamused";
+      if (sceneProgress >=1) {
+        babyX-=5;
+
+        babyX = max (babyX, 100);
+      }
+      if (sceneProgress >= 2 && babyX == 100) {
+        babyEmotion="sick";
+      }
+      if (sceneProgress >=3) {
+        sitterEmotion="angry";
+      }
+      if (sceneProgress >=5) {
+        vomitX+=10;
+        vomitX= min(vomitX, 800);
+      }
+      if (sceneProgress >= 5 && vomitX == 800 && vomitY != 130) {
+        vomitY-=5;
+      }
+      if (vomitY == 130) {
+        vomitY+=200;
+      }
+
+      babyPizzaScene();
+    }
+    if (sceneProgress >=7 && vomitX == 800) {
+      parentsMad = true;
+      momBodyX+=10;
+      momArmX+=10;
+      dadBodyX+=10;
+
+      momBodyX= min(momBodyX, 1200);
+      momArmX= min (momArmX, 1100);
+      dadBodyX = min (dadBodyX, 1375);
+    }
+
+    if (sceneNum == 9) {
+      bt5.getController("Next").hide();
+      stroke(0);
+      strokeWeight(1);
       sitterEmotion="angry";
-    }
-    if (sceneProgress >=5) {
-      vomitX+=10;
-      vomitX= min(vomitX, 800);
-    }
-    if (sceneProgress >= 5 && vomitX == 800 && vomitY != 130) {
-      vomitY-=5;
-    }
-    if (vomitY == 130) {
-      vomitY+=200;
-    }
+      if (sceneProgress >=2) {
+        sitterEmotion="shocked";
+        sitterArmY-=10;
+        sitterArmY2-=10;
 
-    babyPizzaScene();
-  }
-  if (sceneProgress >=7 && vomitX == 800) {
-    parentsMad = true;
-    momBodyX+=10;
-    momArmX+=10;
-    dadBodyX+=10;
-
-    momBodyX= min(momBodyX, 1200);
-    momArmX= min (momArmX, 1100);
-    dadBodyX = min (dadBodyX, 1375);
-  }
-
-  if (sceneNum == 9) {
-    bt5.getController("Next").hide();
-    stroke(0);
-    strokeWeight(1);
-    sitterEmotion="angry";
-    if (sceneProgress >=2) {
-      sitterEmotion="shocked";
-      sitterArmY-=10;
-      sitterArmY2-=10;
-
-      sitterArmY2= max (sitterArmY2, 150);
-      sitterArmY= max (sitterArmY, 150);
+        sitterArmY2= max (sitterArmY2, 150);
+        sitterArmY= max (sitterArmY, 150);
+      }
+      if (sceneProgress >=3 && tornadoProgress != 2) {
+        tornadoX+=10;
+      }
+      if (tornadoX==500) {
+        tornadoProgress++;
+      }
+      if (sceneProgress >=3 && tornadoX <=500 && tornadoProgress ==2) {
+        tornadoX-=10;
+      }
+      if (tornadoX==350 && tornadoProgress ==2) {
+        tornadoProgress--;
+      }
+      stroke(0);
+      tornadoScene();
+      drawRain();
     }
-    if (sceneProgress >=3 && tornadoProgress != 2) {
-      tornadoX+=10;
-    }
-    if (tornadoX==500) {
-      tornadoProgress++;
-    }
-    if (sceneProgress >=3 && tornadoX <=500 && tornadoProgress ==2) {
-      tornadoX-=10;
-    }
-    if (tornadoX==350 && tornadoProgress ==2) {
-      tornadoProgress--;
-    }
-    stroke(0);
-    tornadoScene();
-    drawRain();
   }
 }
 
@@ -568,7 +619,6 @@ void keyPressed() {
 
     if (isPaused == true) {
       isPaused = false;
-      musicFile.amp(((float)musicVolume) / 100); // it takes input between 0 and 1
       bt5.show(); // show all buttons
 
       Story(); // redraw to clear out the pause menu
@@ -596,13 +646,12 @@ void Exit() {
   JOptionPane.showMessageDialog(null, "Thank you for playing babysitter hell simulator!");
   exit();
 }
+
 void mouseClicked() {
   /*
   I needed to make Instructions this way due to the fact that if didn't plan for an instructions method and if I handled it annother way (such is bt5.getController("Instructions").isMouseClicked()) in draw, it would never be consistant.
    */
   int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
-  println(sceneNum);
-  println(sceneProgress);
   if (sceneNum == 1) { // if on main menu
     if (sceneProgress == 0) { // if instructions are NOT toggled
       boolean yCheck = (mouseY <= (height-75) && mouseY >= height-(75+50));
@@ -628,6 +677,10 @@ void mouseClicked() {
       mainMenu(); // call it to clear the instructions
     }
   } else if (isPaused) {
+    if (slowdown == -1) {
+      slowdown = 0; // reset it on click
+      return; // only let it happen once
+    }
     /* Layout
      Button = 80px
      Gap = 40px
@@ -635,6 +688,7 @@ void mouseClicked() {
      Button Gap Button G|P Button Gap Button
      */
     boolean yCheck = (mouseY >= (height/2)-20 && mouseY <= (height/2)+20); // y check for all
+    //boolean yCheckOuter = (mouseY >= (height/2)-40 && mouseY <= (height/2)+40); // y check to see if you should get out
 
     boolean xCheckExit = (mouseX >= 147 && mouseX <= 223); // x position check for exit
     boolean xCheckInstuctions = (mouseX >= 147+ 154  && mouseX <= 223 +154); // x position check for Instructions
@@ -644,17 +698,24 @@ void mouseClicked() {
     if (yCheck == true) {
       if (xCheckExit == true) {
         Exit();
-      }
-      if (xCheckInstuctions == true) {
-        println("xCheckInstuctions");
-      }
-      if (xCheckMainMenu == true) { // if user clicked on main menu button
+      } else if (xCheckInstuctions == true) {
+        slowdown = -1; // used so draw does not overwrite the text
+        rectMode(CORNERS);
+        fill(0); // fill black
+        rect(55, 55, width - 55, height - 55);
+        rectMode(CENTER);
+        fill(255); // set text color to white
+        text("Press ESC or click anywhere to get out", 55, 45);
+
+        textSize(18);
+        text("Welcome to this animated storybook! \nThis educational story focuses on what you shouldn't do as a babysitter by \nusing a look don't tell type of communication. \n\nIn order to progress the story click the spacebar and different lines \nof dialouge will show up. \nTo go to the next scene use the right arrow key once the scene is finished. \n you will know if the scene is finished if a button in the bottom right \nbecomes visible! \nIf you want to go back a scene use the left arrow key. \nThis can be done at anytime! \nIf you want to pause the game use the ESC function", 90, 95);
+        textSize(20);
+      } else if (xCheckMainMenu == true) { // if user clicked on main menu button
         isPaused = false;
         sceneNum = 1; // main menu scene num
         bt5.show();
         Story();
-      }
-      if (xCheckSetAudio == true) {
+      } else if (xCheckSetAudio == true) {
         while (true) {
           int tempVolume = getInt("Please enter your desired volume (between 0 for muted and 100 for full volume)");
           if (tempVolume > 100 || tempVolume < 0) {
@@ -662,17 +723,19 @@ void mouseClicked() {
           } else {
             JOptionPane.showMessageDialog(null, "The volume has been set to: " +  tempVolume + "%");
             musicVolume = tempVolume;
-            musicFile.amp(musicVolume / 100); // set it to it's default of 50% volume
+            musicFile.amp(((float)musicVolume) / 100); // set music
             break;
           }
         }
+      } else { // for when they click between buttons
+        isPaused = false;
+        bt5.show(); // show all buttons
+        Story(); // redraw to clear out the pause menu
       }
-    }
-
-
-
-    if (yCheck) { // if the user is pressing the button and not somewhere else
-      bt5.hide();
+    } else { // when they click above or below
+      isPaused = false;
+      bt5.show(); // show all buttons
+      Story(); // redraw to clear out the pause menu
     }
   }
 }
@@ -727,7 +790,7 @@ void introScene() {
 
   pushMatrix();
   translate(-15, 0);
-  delay(100);
+  delay(100); // so the animation is smooth
   drawMom();
   drawDad();
   popMatrix();
@@ -737,9 +800,6 @@ void introScene() {
   translate(50, 110);
   drawSitter();
   popMatrix();
-  textSize(15);
-  text("Press space to continue", 20, 32) ;
-  textSize(20);
   if (sceneNum == 2 && sceneProgress == 1) {
     pushMatrix(); //small icon to show which character is talking
     scale(0.4);
@@ -831,6 +891,11 @@ void introScene() {
   }
   if (sceneProgress >=6) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(147, 105, 70); // hair color
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 }
 
@@ -881,7 +946,6 @@ void babyFireSlide() {
   fill(245, 0, 0);
   ellipse(125, 275, 25, 15);
   ellipse(125+55, 275, 25, 15);
-
   if (sceneProgress == 1) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
@@ -1002,7 +1066,7 @@ void babyFireSlide() {
     triangle(175, 285, 215, 285, 200, fireY);
   }
 
-  if (sceneProgress >= 9 && babyX == 25) {
+  if (sceneProgress == 9 && babyX == 25) {
     pushMatrix();
     scale(0.9);
     translate(-240, 150);
@@ -1014,7 +1078,7 @@ void babyFireSlide() {
     text("Wahhhh wahhhhhhh \nWAHHHHHHHHHHHHHHHHH", 100, 450);
   }
 
-  if (sceneProgress >= 10 && babyEmotion == "crying") {
+  if (sceneProgress == 10 && babyEmotion == "crying") {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -1045,7 +1109,7 @@ void babyFireSlide() {
     fill(0);
     text("hm, oh, you're crying... \ncan you be quiet i'm trying to order pizza", 100, 450);
   }
-  if (sceneProgress >= 11) {
+  if (sceneProgress == 11) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -1078,6 +1142,11 @@ void babyFireSlide() {
   }
   if (sceneProgress >=11) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(147, 105, 70); // hair color
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 
   pushMatrix();
@@ -1131,7 +1200,6 @@ void babyCribScene() {
   translate(900, 75);
   drawSitter();
   popMatrix();
-
   if (sceneProgress == 0) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
@@ -1207,6 +1275,11 @@ void babyCribScene() {
   }
   if (sceneProgress >=3) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(122, 97, 142); //darker pirple
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 }
 
@@ -1307,6 +1380,11 @@ void babyCrawlScene() {
   }
   if (sceneProgress >=2 && babyX == 1100) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(122, 97, 142); //darker pirple
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 }
 
@@ -1344,6 +1422,11 @@ void babyFallScene() {
   }
   if (sceneProgress >=1) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(90, 90, 90); // lighter grey
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 }
 
@@ -1480,6 +1563,11 @@ void babyPickupScene() {
   }
   if (sceneProgress >=4) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(130, 130, 130); // dark grey
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 }
 
@@ -1713,6 +1801,11 @@ void babyPizzaScene() {
   }
   if (sceneProgress >=8 && momBodyX == 1200) {
     bt5.getController("Next").show();
+  } else {
+    textSize(15);
+    fill(0); // black
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
   }
 }
 
@@ -1846,6 +1939,30 @@ void tornadoScene() {
     text("AHHHH!!!!", 100, 450);
     textSize(20);
   }
+  if (sceneProgress > 4) { // game over
+    JOptionPane.showMessageDialog(null, "Thank you for playing The Bad Babysitter " + username);
+
+    while (true) {
+      char choice = getChar("Do you want to play again (y/n)");
+      if (choice == 'y' || choice == 'Y') {
+        username = "";
+        isPaused = false;
+        sceneNum = 1; // main menu scene num
+        Story();
+        break;
+      } else if (choice == 'n' || choice == 'N') {
+        exit(); // don't call Exit() since we already thanked the user
+        break;
+      } else {
+        JOptionPane.showMessageDialog(null, username + ", " + choice + " is not a valid option");
+      }
+    }
+  } else {
+    textSize(15);
+    fill(0); // black
+    text("Press space to continue", 20, 32) ;
+    textSize(20);
+  }
 }
 
 
@@ -1961,8 +2078,14 @@ void splashScreen() {
     line(x, baseY+20, x+len, baseY+20);
   }
 
+  textAlign(CENTER);
+  textSize(40);
+  fill(0);
+  text("The Bad Babysitter", 215, 65); // game name
+  textSize(20);
+  textAlign(LEFT); // reset
 
-  // dont toych
+  // only  draw chars on splash not on main menu
   if (sceneNum == 0) {
     stroke(0);
     pushMatrix();
@@ -1977,6 +2100,10 @@ void splashScreen() {
     popMatrix();
     drawBaby();
     popMatrix();
+  } else {
+    textSize(24);
+    text("Skip to", 20, height - (18 * 8)); // add skip to text for scene skipper
+    textSize(20);
   }
 }
 
