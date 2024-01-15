@@ -1,5 +1,4 @@
 import controlP5.*;
-import controlP5.BitFont;
 import processing.sound.*;
 
 /*
@@ -86,8 +85,7 @@ void Story() {
     momArmX=400;
     dadBodyX=675;
     splashScreen();
-  } else if (sceneNum == 1 || sceneNum == -1) {
-    print((bt5.getController("SetUsername") == null));
+  } else if (sceneNum == 1) {
     if (bt5.getController("SetUsername") == null) { // if it does not already exist
       int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
       bt5.addButton("SetUsername")
@@ -536,6 +534,7 @@ void draw() {
       sitterArmY2-=10;
 
       sitterArmY2= max (sitterArmY2, 150);
+      sitterArmY= max (sitterArmY, 150);
     }
     if (sceneProgress >=3 && tornadoProgress != 2) {
       tornadoX+=10;
@@ -613,7 +612,7 @@ void mouseClicked() {
 
         sceneProgress = 1; // so that other controllers can check.
         rectMode(CORNERS);
-        noStroke(); // doFnt do red outline
+        noStroke(); // don't do red outline
         fill(0, 0, 0); // quicklyish fill black
         rect(55, 55, width - 55, height - 55);
         rectMode(CORNER); // reset it back
@@ -621,8 +620,7 @@ void mouseClicked() {
         text("Press ESC or click anywhere to get out", 55, 45);
         fill(255); // set text color to white
         text("X", 70, 85); // an X just to make it more clear
-
-        // todo: Write instructions
+        text("Welcome to this animated storybook! \nThis educational story focuses on what you shouldn't do as a babysitter by \nusing a look don't tell type of communication. \n\nIn order to progress the story click the spacebar and different lines \nof dialouge will show up. \nTo go to the next scene use the right arrow key once the scene is finished. \n you will know if the scene is finished if a button in the bottom right \nbecomes visible! \nIf you want to go back a scene use the left arrow key. \nThis can be done at anytime! \nIf you want to pause the game use the ESC function", 90, 95);
       }
     } else { // instructions ARE toggled so unset.
       sceneProgress = 0; // set to "not on instructions"
@@ -1344,7 +1342,7 @@ void babyFallScene() {
     text("GAHHAHDHAHGJ!!!!!!!!!!!!", 0, 450);
     textSize(20);
   }
-  if (sceneProgress >=4) {
+  if (sceneProgress >=1) {
     bt5.getController("Next").show();
   }
 }
@@ -1479,6 +1477,9 @@ void babyPickupScene() {
 
     fill(0);
     text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 425);
+  }
+  if (sceneProgress >=4) {
+    bt5.getController("Next").show();
   }
 }
 
