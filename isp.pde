@@ -8,16 +8,7 @@ Authors: Jason Cameron & Simon Michetti
  Description: This program creates an immersive game in the background for users to learn about the potential dangers of babysitting and provides an outline of what a bad babysitting habits look like. This game takes on a look don't tell form of communication where the player isn't explicitly told about what is going on but can clearly understand the ideas being presented.
  */
 
-
-/*
-Changes from plan:
- - drawRain & drawFire being changed from global varibles to methods
- - renamed slowdownOne to slowdown and removed slowdownTwo
- - renamed playMusic to musicVolume and added musicFile.
- */
-
-
-ControlP5 bt5;  // variable for the button controller
+ControlP5 bt5; // variable for the button controller
 SoundFile musicFile; // varible to load the sound file into and to be able to change volume globally
 PFont text; // varible so we can load in the font.
 int musicVolume = 50; // if music should be played: default 50
@@ -30,26 +21,27 @@ String sitterEmotion = "unamused"; // the emotion to draw the sitter in
 String babyEmotion = "sick"; // the emotion to draw the baby in
 float slowdown = 0; // a way to control the animation speed for certain parts of a frame
 
+int splashScreenFire=220; //variable to animate the splashscreen
 
-int momArmX=400; //variables that help animate the mom and dad
-int momArmY=232;
-int momBodyX=500;
-int dadBodyX=675;
+int momArmX = 400; //variables that help animate the mom and dad
+int momArmY = 232;
+int momBodyX = 500;
+int dadBodyX = 675;
 
-int sitterX=150; //variables that animate the babysitter
-int sitterArmY=360;
-int sitterArmY2=360;
-int sitterArmX=210;
+int sitterX = 150; //variables that animate the babysitter
+int sitterArmY = 360;
+int sitterArmY2 = 360;
+int sitterArmX = 210;
 
-int babyX=300; //variables that animate the baby
-int babyY=350;
+int babyX = 300; //variables that animate the baby
+int babyY = 350;
 
-int fireY=281; //variable to animate the fire in scene 3
+int fireY = 281; //variable to animate the fire in scene 3
 
-int vomitX=340; //variables to animate the vomit of the baby in scene 8
-int vomitY=250;
-int tornadoX=-300; //variable to move the tornado around in the last scene
-int tornadoProgress=1; //variable to control tornado movement in the final scene
+int vomitX = 340; //variables to animate the vomit of the baby in scene 8
+int vomitY = 250;
+int tornadoX = -300; //variable to move the tornado around in the last scene
+int tornadoProgress = 1; //variable to control tornado movement in the final scene
 
 void setup() {
   text = loadFont("Consolas-48.vlw");
@@ -65,16 +57,16 @@ void setup() {
     .setValue(255)
     .setSize(40, 30)
     .setCaptionLabel(">")
-    .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
-    .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
-    .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
+    .setColorForeground(color(0, 0, 0, 255)) // Set regular color with alpha channel to black
+    .setColorBackground(color(0, 0, 0, 255)) // Set hover color as transparent
+    .setColorActive(color(0, 0, 0, 255)) // Set click color (if needed)
     .setBroadcast(true);
 
   Story();
 }
 
 void SkipScenes(int theChoice) {
-  if (mouseX > 140 && mouseY > height-170 ) {
+  if (mouseX > 140 && mouseY > height - 170) {
     return; // fixes a bug where it constantly tries to call this even though there is no username selected
   }
   if (username == "") {
@@ -96,41 +88,44 @@ void SkipScenes(int theChoice) {
 void Story() {
   print("Going to: " + sceneNum);
   if (sceneNum == 0) {
-    momBodyX=500;
-    momArmY=232;
-    momArmX=400;
-    dadBodyX=675;
+    frameRate(20);
+    splashScreenFire=220;
+    momBodyX = 500;
+    momArmY = 232;
+    momArmX = 400;
+    dadBodyX = 675;
     splashScreen();
   } else if (sceneNum == 1) {
+    frameRate(20);
+    splashScreenFire=220;
     if (bt5.getController("SetUsername") == null) { // if it does not already exist
-      int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
+      int middle = (width / 2) - 40; // compensate for the fact that controlp5 draws from top corner
       bt5.addButton("SetUsername")
         .setColorBackground(color(0, 0, 0))
-        .setPosition(middle - 190, height-125)
-        .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
-        .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
-        .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
+        .setPosition(middle - 190, height - 125)
+        .setColorForeground(color(0, 0, 0, 255)) // Set regular color with alpha channel to black
+        .setColorBackground(color(0, 0, 0, 255)) // Set hover color as transparent
+        .setColorActive(color(0, 0, 0, 255)) // Set click color (if needed)
         .setCaptionLabel("SET USERNAME") // give it a space
         .setSize(80, 50);
 
       bt5.addButton("Exit")
         .setColorBackground(color(0, 0, 0))
-        .setPosition(middle + 190, height-125)
-        .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
-        .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
-        .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
+        .setPosition(middle + 190, height - 125)
+        .setColorForeground(color(0, 0, 0, 255)) // Set regular color with alpha channel to black
+        .setColorBackground(color(0, 0, 0, 255)) // Set hover color as transparent
+        .setColorActive(color(0, 0, 0, 255)) // Set click color (if needed)
         .setSize(80, 50);
 
-
       bt5.addSlider("musicVolume")
-        .setPosition(width/2 - 75, height-50)
+        .setPosition(width / 2 - 75, height - 50)
         .setSize(150, 20)
         .setRange(0, 100)
         .setValue(musicVolume) // default volume
         .setColorBackground(color(0, 0, 0))
         .setColorCaptionLabel(color(20, 20, 20))
-        .setColorActive(color(140, 0, 0))   // set the hover color to a lighter red
-        .setColorForeground(color(120, 0, 0));      // Set normal color to the red
+        .setColorActive(color(140, 0, 0)) // set the hover color to a lighter red
+        .setColorForeground(color(120, 0, 0)); // Set normal color to the red
     }
     //String promoteTo; illigal code :pensive:
     //do {
@@ -154,72 +149,72 @@ void Story() {
       .addItem("Tornado Scene", 9)
       .setColorLabel(color(0)) // set text to black
       .setColorBackground(color(0)) // set bg to background
-      .setColorActive(color(102, 0, 0))      // Set selected color to the red
-      .setColorForeground(color(140, 0, 0));   // set the hover color to ligher red
+      .setColorActive(color(102, 0, 0)) // Set selected color to the red
+      .setColorForeground(color(140, 0, 0)); // set the hover color to ligher red
 
     bt5.getController("Next").show();
     mainMenu();
   } else if (sceneNum == 2) {
-    momBodyX=500;
-    dadBodyX=675;
-    sitterX=150;
-    sitterArmX=210;
-    sitterArmY=360;
-    momArmX=400;
-    momArmY=232;
+    frameRate(60);
+    momBodyX = 500;
+    dadBodyX = 675;
+    sitterX = 150;
+    sitterArmX = 210;
+    sitterArmY = 360;
+    momArmX = 400;
+    momArmY = 232;
     introScene();
   } else if (sceneNum == 3) {
-    sitterX=150;
-    sitterArmX=210;
-    sitterArmY=360;
-    babyX=300;
-    babyY=350;
-    fireY=281;
+    sitterX = 150;
+    sitterArmX = 210;
+    sitterArmY = 360;
+    babyX = 300;
+    babyY = 350;
+    fireY = 281;
     babyFireSlide();
   } else if (sceneNum == 4) {
-    sitterX=150;
-    sitterArmX=210;
-    sitterArmY=360;
-    babyX=300;
+    sitterX = 150;
+    sitterArmX = 210;
+    sitterArmY = 360;
+    babyX = 300;
     babyCribScene();
   } else if (sceneNum == 5) {
-    babyX=300;
+    babyX = 300;
     babyCrawlScene();
   } else if (sceneNum == 6) {
-    babyX=300;
-    babyY=350;
+    babyX = 300;
+    babyY = 350;
     babyFallScene();
   } else if (sceneNum == 7) {
-    babyX=300;
-    babyY=350;
-    sitterX=150;
-    sitterArmX=210;
+    babyX = 300;
+    babyY = 350;
+    sitterX = 150;
+    sitterArmX = 210;
     babyPickupScene();
   } else if (sceneNum == 8) {
-    sitterX=150;
-    sitterArmX=210;
-    sitterArmY=360;
-    sitterArmY2=360;
-    babyX=300;
-    babyY=350;
-    vomitX=340;
-    vomitY=250;
-    momBodyX=500;
-    momArmX=400;
-    momArmY=232;
-    dadBodyX=675;
+    sitterX = 150;
+    sitterArmX = 210;
+    sitterArmY = 360;
+    sitterArmY2 = 360;
+    babyX = 300;
+    babyY = 350;
+    vomitX = 340;
+    vomitY = 250;
+    momBodyX = 500;
+    momArmX = 400;
+    momArmY = 232;
+    dadBodyX = 675;
     babyPizzaScene();
   } else if (sceneNum == 9) {
-    sitterX=150;
-    sitterArmX=210;
-    sitterArmY=360;
-    sitterArmY2=360;
-    tornadoX=-300;
-    tornadoProgress=1;
+    sitterX = 150;
+    sitterArmX = 210;
+    sitterArmY = 360;
+    sitterArmY2 = 360;
+    tornadoX = -300;
+    tornadoProgress = 1;
     tornadoScene();
   }
 }
-
 
 void Next() {
   println("next!!!!!!!!!!");
@@ -228,7 +223,7 @@ void Next() {
   }
   sceneProgress = 0;
   boolean goNext = true;
-  if (sceneNum == 0 && bt5.getController("Prev") == null ) {
+  if (sceneNum == 0 && bt5.getController("Prev") == null) {
     println("adding prev button");
     bt5.addButton("Prev")
       .setBroadcast(false)
@@ -236,13 +231,13 @@ void Next() {
       .setValue(255)
       .setSize(40, 30)
       .setCaptionLabel("<")
-      .setColorForeground(color(0, 0, 0, 255))  // Set regular color with alpha channel to black
-      .setColorBackground(color(0, 0, 0, 255))    // Set hover color as transparent
-      .setColorActive(color(0, 0, 0, 255))      // Set click color (if needed)
+      .setColorForeground(color(0, 0, 0, 255)) // Set regular color with alpha channel to black
+      .setColorBackground(color(0, 0, 0, 255)) // Set hover color as transparent
+      .setColorActive(color(0, 0, 0, 255)) // Set click color (if needed)
       .setBroadcast(true);
   }
 
-  if (sceneNum ==1 ) { // main menu
+  if (sceneNum == 1) { // main menu
     if (username == "") { // block continue if username has not been set
       JOptionPane.showMessageDialog(null, "You must set a username in order to play");
       goNext = false;
@@ -256,7 +251,7 @@ void Next() {
   }
 
   if (goNext == true) {
-    sceneNum = (min(sceneNum +1, 9)); // prevent going over last scene
+    sceneNum = (min(sceneNum + 1, 9)); // prevent going over last scene
     Story();
   }
 }
@@ -285,17 +280,12 @@ void Prev() {
 void mainMenu() {
   // other code is added in draw/Story
   bt5.show();
+  int middle = (width / 2) - 40; // compensate for the fact that controlp5 draws from top corner
   splashScreen();
-
-  fill(0, 0, 0);
-  noStroke();
-  int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
-  rect(middle, height-125, 80, 50);
-  //  text("Instructions", (width/2), height-(125 + (50/2)));
   if (bt5.getController("Instructions") == null) { // only add it if it doest already exist
     bt5.addTextlabel("Instructions")
       .setText("INSTRUCTIONS")
-      .setPosition(middle + 4, height-(125 - (50/2) + 5));
+      .setPosition(middle + 4, height - (125 - (50 / 2) + 5));
   }
 }
 
@@ -328,44 +318,40 @@ void drawRain() {
     strokeWeight(1);
     stroke(72, 150, 180);
     fill(72, 150, 180);
-    for (int i = 0; i<50; i++) {
+    for (int i = 0; i < 50; i++) {
       ellipse(random(0, width), random(0, height), 2, 10);
     }
   }
 }
 
-
 void draw() {
-  //if (sceneNum == 1 && sceneProgress == 1) { // if on main menu and is on instructions
-  //  print("hi");
-  //  bt5.hide(); // hide all controllers
-  //  bt5.getController("Next").hide();
-  //  bt5.getController("Prev").hide();
-  //}
+  if (sceneNum == 1) {
+    musicFile.amp(((float) musicVolume) / 100); // set music
+  }
 
   if (isPaused == true && slowdown != -1) {
     /*
-    I need to do custom buttons for this as there is a bug where controlp5 only
+    I need to do custom buttons for this as there is a bug where controlp5 only draws after
      */
     rectMode(CORNERS);
     fill(0, 0, 0, 10); // slowly fill black
     rect(55, 55, width - 55, height - 55);
     rectMode(CENTER);
-    int Ymiddle = (height/2); // compensate for the fact that controlp5 draws from top corner
+    int Ymiddle = (height / 2); // compensate for the fact that controlp5 draws from top corner
     int Bwidth = 77; // width of the buttons
     int Bheight = 40; // height of the buttons
-    float spacing = 2* Bwidth;// + (Bwidth / 2);
+    float spacing = 2 * Bwidth; // + (Bwidth / 2);
 
     fill(255); // set button color to white
 
-    rect(31+ (spacing * 1), Ymiddle, Bwidth, Bheight);
-    rect(31+  (spacing * 2), Ymiddle, Bwidth, Bheight);
-    rect(31+ (spacing * 3), Ymiddle, Bwidth, Bheight);
-    rect(31+ (spacing * 4), Ymiddle, Bwidth, Bheight);
+    rect(31 + (spacing * 1), Ymiddle, Bwidth, Bheight);
+    rect(31 + (spacing * 2), Ymiddle, Bwidth, Bheight);
+    rect(31 + (spacing * 3), Ymiddle, Bwidth, Bheight);
+    rect(31 + (spacing * 4), Ymiddle, Bwidth, Bheight);
     rectMode(CORNER);
     fill(0); // set color to black
     textSize(16);
-    Ymiddle+=5; // so text is centered
+    Ymiddle += 5; // so text is centered
     // Labels for the buttons
     text("Exit", 18 + (spacing * 1), Ymiddle);
     textSize(14);
@@ -377,7 +363,7 @@ void draw() {
     fill(255);
     text("Press ESC or click anywhere besides the buttons to continue", 65, 75);
     textAlign(CENTER);
-    text("The Bad Babysitter: By Jason Cameron & Simon Michetti Studios", width/2, height/2 - 70);
+    text("The Bad Babysitter: By Jason Cameron & Simon Michetti Studios", width / 2, height / 2 - 70);
     textSize(20); // reset font to normal
     textAlign(LEFT); // reset to norm
     return;
@@ -391,106 +377,112 @@ void draw() {
       drawRain();
     }
   }
+  if (sceneNum<= 1 && sceneProgress == 0) {
+    if (sceneProgress >=0) {
+      splashScreenFire+=5;
+    }
+    if (splashScreenFire>=260) {
+      splashScreenFire-=60;
+    }
+    splashScreen();
+  }
   if (slowdown != -1) {
-    if (sceneNum==2) { //animation that appears in this screen
+    if (sceneNum == 2) { //animation that appears in this screen
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      parentsMad=false;
-      if (sceneProgress == 1 || sceneNum==2) {
+      parentsMad = false;
+      if (sceneProgress == 1 || sceneNum == 2) {
         line(450, 292, 440, 332); //left mom arm
-        line(440, 332, momArmX+40, momArmY+150);
-        momArmX=momArmX-5;  //animation to raise the moms arm in a greeting/acknoledgement of departure
-        momArmY=momArmY-5;
+        line(440, 332, momArmX + 40, momArmY + 150);
+        momArmX = momArmX - 5; //animation to raise the moms arm in a greeting/acknoledgement of departure
+        momArmY = momArmY - 5;
         momArmY = max(momArmY, 132);
         momArmX = max(momArmX, 380);
       }
-      if (sceneProgress >= 4 || sceneProgress >=10) {
-        momArmX=momArmX+15;
+      if (sceneProgress >= 4 || sceneProgress >= 10) {
+        momArmX = momArmX + 15;
         momArmX = min(momArmX, 100000);
-        momBodyX=momBodyX+10;  //showing the parents leave the scene
-        dadBodyX=dadBodyX+10;
+        momBodyX = momBodyX + 10; //showing the parents leave the scene
+        dadBodyX = dadBodyX + 10;
       }
-      if (sceneProgress >= 6 || sceneProgress >=10) {
-        sitterX= sitterX-10; //showing the babysitter leave the scene
-        sitterArmX= sitterArmX-10;
+      if (sceneProgress >= 6 || sceneProgress >= 10) {
+        sitterX = sitterX - 10; //showing the babysitter leave the scene
+        sitterArmX = sitterArmX - 10;
       }
       introScene();
     }
 
-
-    if (sceneNum==3) { //animation that appears in this scene
+    if (sceneNum == 3) { //animation that appears in this scene
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      babyEmotion="normal";
+      babyEmotion = "normal";
 
       if (sceneProgress >= 0 && sceneNum == 3) {
-        sitterX=sitterX-10; //showing the babysitter slide into the scene as if he was coming from the last one.
-        sitterArmX=sitterArmX-10;
-        sitterX = max (sitterX, -260);
-        sitterArmX = max (sitterArmX, -200);
+        sitterX = sitterX - 10; //showing the babysitter slide into the scene as if he was coming from the last one.
+        sitterArmX = sitterArmX - 10;
+        sitterX = max(sitterX, -260);
+        sitterArmX = max(sitterArmX, -200);
       }
 
       if (sceneProgress >= 5) {
-        line(sitterX+60, 300, sitterArmX, sitterArmY); // right babysitter arm moving to take his phone out of his pocket
-        sitterArmX=sitterArmX+5;
-        sitterArmY=sitterArmY-5;
-        sitterArmX= max (sitterArmX, -190);
-        sitterArmY= max (sitterArmY, 250);
+        line(sitterX + 60, 300, sitterArmX, sitterArmY); // right babysitter arm moving to take his phone out of his pocket
+        sitterArmX = sitterArmX + 5;
+        sitterArmY = sitterArmY - 5;
+        sitterArmX = max(sitterArmX, -190);
+        sitterArmY = max(sitterArmY, 250);
       }
       if (sceneProgress >= 7) {
-        babyX=babyX-5; //the baby sliding over to the stove which will then catch on fire
-        babyX= max (babyX, 25);
+        babyX = babyX - 5; //the baby sliding over to the stove which will then catch on fire
+        babyX = max(babyX, 25);
       }
-      if (sceneProgress >=8 && babyX==25) {
-        fireY=fireY-7;  //the fire on the stove turning on and burning the baby
-        fireY = max (fireY, 250);
+      if (sceneProgress >= 8 && babyX == 25) {
+        fireY = fireY - 7; //the fire on the stove turning on and burning the baby
+        fireY = max(fireY, 250);
       }
-      if (fireY==250) {
-        fireY+=20;
+      if (fireY == 250) {
+        fireY += 20;
       }
 
-      if (sceneProgress >= 9 && fireY>=250 && babyX == 25) {
+      if (sceneProgress >= 9 && fireY >= 250 && babyX == 25) {
         babyEmotion = "crying"; //showing how the baby is now crying because of the fire
       }
       babyFireSlide();
     }
 
-
-    if (sceneNum == 4) {  //animation that happens in scene 4
+    if (sceneNum == 4) { //animation that happens in scene 4
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      babyEmotion="crying";
+      babyEmotion = "crying";
 
       if (sceneProgress >= 0 && babyX != -620) {
-        sitterX=sitterX-10;
-        sitterArmX=sitterArmX-10;
-        sitterX= max (sitterX, -500);
-        sitterArmX= max (sitterArmX, -440);
+        sitterX = sitterX - 10;
+        sitterArmX = sitterArmX - 10;
+        sitterX = max(sitterX, -500);
+        sitterArmX = max(sitterArmX, -440);
 
-        babyX= babyX-10;
-        babyX= max(babyX, -620);
+        babyX = babyX - 10;
+        babyX = max(babyX, -620);
       }
 
-      if (sceneProgress >=1 && sceneNum == 4 && babyX <=-620) {
-        sitterX=sitterX+10;
-        sitterArmX=sitterArmX+10;
+      if (sceneProgress >= 1 && sceneNum == 4 && babyX <= -620) {
+        sitterX = sitterX + 10;
+        sitterArmX = sitterArmX + 10;
       }
       babyCribScene();
     }
-
 
     if (sceneNum == 5) {
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      babyEmotion="normal";
+      babyEmotion = "normal";
 
       if (sceneProgress == 0 || sceneNum == 5) {
-        babyX=babyX+10;
-        babyX= min (babyX, 1100);
+        babyX = babyX + 10;
+        babyX = min(babyX, 1100);
       }
 
       babyCrawlScene();
@@ -500,9 +492,9 @@ void draw() {
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      babyEmotion="shocked";
+      babyEmotion = "shocked";
       if (sceneProgress >= 0) {
-        babyY=babyY+10;
+        babyY = babyY + 10;
       }
 
       babyFallScene();
@@ -512,22 +504,21 @@ void draw() {
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      babyEmotion="crying";
-      sitterEmotion="unamused";
+      babyEmotion = "crying";
+      sitterEmotion = "unamused";
       if (sceneProgress >= 0) {
-        babyX=babyX+10;
-        babyY=babyY+5;
-        sitterX=sitterX-10;
-        sitterArmX=sitterArmX-10;
+        babyX = babyX + 10;
+        babyY = babyY + 5;
+        sitterX = sitterX - 10;
+        sitterArmX = sitterArmX - 10;
 
-
-        sitterArmX= max (sitterArmX, -210);
-        sitterX = max (sitterX, -270);
-        babyY= min (babyY, 525);
-        babyX= min (babyX, 650);
+        sitterArmX = max(sitterArmX, -210);
+        sitterX = max(sitterX, -270);
+        babyY = min(babyY, 525);
+        babyX = min(babyX, 650);
       }
-      if (sceneProgress >=1 && babyX==650) {
-        babyX-=20;
+      if (sceneProgress >= 1 && babyX == 650) {
+        babyX -= 20;
       }
       babyPickupScene();
     }
@@ -536,66 +527,66 @@ void draw() {
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      babyEmotion="normal";
-      sitterEmotion="unamused";
-      if (sceneProgress >=1) {
-        babyX-=5;
+      babyEmotion = "normal";
+      sitterEmotion = "unamused";
+      if (sceneProgress >= 1) {
+        babyX -= 5;
 
-        babyX = max (babyX, 100);
+        babyX = max(babyX, 100);
       }
       if (sceneProgress >= 2 && babyX == 100) {
-        babyEmotion="sick";
+        babyEmotion = "sick";
       }
-      if (sceneProgress >=3) {
-        sitterEmotion="angry";
+      if (sceneProgress >= 3) {
+        sitterEmotion = "angry";
       }
-      if (sceneProgress >=5) {
-        vomitX+=10;
-        vomitX= min(vomitX, 800);
+      if (sceneProgress >= 5) {
+        vomitX += 10;
+        vomitX = min(vomitX, 800);
       }
       if (sceneProgress >= 5 && vomitX == 800 && vomitY != 130) {
-        vomitY-=5;
+        vomitY -= 5;
       }
       if (vomitY == 130) {
-        vomitY+=200;
+        vomitY += 200;
       }
 
       babyPizzaScene();
     }
-    if (sceneProgress >=7 && vomitX == 800) {
+    if (sceneProgress >= 7 && vomitX == 800) {
       parentsMad = true;
-      momBodyX+=10;
-      momArmX+=10;
-      dadBodyX+=10;
+      momBodyX += 10;
+      momArmX += 10;
+      dadBodyX += 10;
 
-      momBodyX= min(momBodyX, 1200);
-      momArmX= min (momArmX, 1100);
-      dadBodyX = min (dadBodyX, 1375);
+      momBodyX = min(momBodyX, 1200);
+      momArmX = min(momArmX, 1100);
+      dadBodyX = min(dadBodyX, 1375);
     }
 
     if (sceneNum == 9) {
       bt5.getController("Next").hide();
       stroke(0);
       strokeWeight(1);
-      sitterEmotion="angry";
-      if (sceneProgress >=2) {
-        sitterEmotion="shocked";
-        sitterArmY-=10;
-        sitterArmY2-=10;
+      sitterEmotion = "angry";
+      if (sceneProgress >= 2) {
+        sitterEmotion = "shocked";
+        sitterArmY -= 10;
+        sitterArmY2 -= 10;
 
-        sitterArmY2= max (sitterArmY2, 150);
-        sitterArmY= max (sitterArmY, 150);
+        sitterArmY2 = max(sitterArmY2, 150);
+        sitterArmY = max(sitterArmY, 150);
       }
-      if (sceneProgress >=3 && tornadoProgress != 2) {
-        tornadoX+=10;
+      if (sceneProgress >= 3 && tornadoProgress != 2) {
+        tornadoX += 10;
       }
-      if (tornadoX==500) {
+      if (tornadoX == 500) {
         tornadoProgress++;
       }
-      if (sceneProgress >=3 && tornadoX <=500 && tornadoProgress ==2) {
-        tornadoX-=10;
+      if (sceneProgress >= 3 && tornadoX <= 500 && tornadoProgress == 2) {
+        tornadoX -= 10;
       }
-      if (tornadoX==350 && tornadoProgress ==2) {
+      if (tornadoX == 350 && tornadoProgress == 2) {
         tornadoProgress--;
       }
       stroke(0);
@@ -630,13 +621,12 @@ void keyPressed() {
     key = 0; // needed so processing doesn't close when you click it.
   } else if (keyCode == 37 && isPaused == false && bt5.getController("Prev") != null && bt5.getController("Prev").isVisible()) { // Left arrow
     Prev();
-  } else if (keyCode == 39  && isPaused == false && bt5.getController("Next").isVisible()) { // Right arrow
+  } else if (keyCode == 39 && isPaused == false && bt5.getController("Next").isVisible()) { // Right arrow
     Next();
-  } else if ( key == ' ') { // if user just clicked space
-
+  } else if (key == ' ') { // if user just clicked space
 
     //  if (sceneNum >= 2) {
-    sceneProgress ++;
+    sceneProgress++;
     println(sceneProgress);
     //}
   }
@@ -651,11 +641,11 @@ void mouseClicked() {
   /*
   I needed to make Instructions this way due to the fact that if didn't plan for an instructions method and if I handled it annother way (such is bt5.getController("Instructions").isMouseClicked()) in draw, it would never be consistant.
    */
-  int middle = (width/2) - 40; // compensate for the fact that controlp5 draws from top corner
+  int middle = (width / 2) - 40; // compensate for the fact that controlp5 draws from top corner
   if (sceneNum == 1) { // if on main menu
     if (sceneProgress == 0) { // if instructions are NOT toggled
-      boolean yCheck = (mouseY <= (height-75) && mouseY >= height-(75+50));
-      boolean xCheck = (mouseX >= middle && mouseX <= middle+80); // 80 is the width of the box
+      boolean yCheck = (mouseY <= (height - 75) && mouseY >= height - (75 + 50));
+      boolean xCheck = (mouseX >= middle && mouseX <= middle + 80); // 80 is the width of the box
       if (yCheck && xCheck) { // if the user is pressing the button and not somewhere else
         bt5.hide();
 
@@ -665,8 +655,9 @@ void mouseClicked() {
         fill(0, 0, 0); // quicklyish fill black
         rect(55, 55, width - 55, height - 55);
         rectMode(CORNER); // reset it back
-
-        text("Press ESC or click anywhere to get out", 55, 45);
+        textAlign(RIGHT);
+        text("Press ESC or click anywhere to get out", width-55, 45);
+        textAlign(LEFT);
         fill(255); // set text color to white
         text("X", 70, 85); // an X just to make it more clear
         text("Welcome to this animated storybook! \nThis educational story focuses on what you shouldn't do as a babysitter by \nusing a look don't tell type of communication. \n\nIn order to progress the story click the spacebar and different lines \nof dialouge will show up. \nTo go to the next scene use the right arrow key once the scene is finished. \n you will know if the scene is finished if a button in the bottom right \nbecomes visible! \nIf you want to go back a scene use the left arrow key. \nThis can be done at anytime! \nIf you want to pause the game use the ESC function", 90, 95);
@@ -687,13 +678,13 @@ void mouseClicked() {
      G|P = middle of screen + gap
      Button Gap Button G|P Button Gap Button
      */
-    boolean yCheck = (mouseY >= (height/2)-20 && mouseY <= (height/2)+20); // y check for all
+    boolean yCheck = (mouseY >= (height / 2) - 20 && mouseY <= (height / 2) + 20); // y check for all
     //boolean yCheckOuter = (mouseY >= (height/2)-40 && mouseY <= (height/2)+40); // y check to see if you should get out
 
     boolean xCheckExit = (mouseX >= 147 && mouseX <= 223); // x position check for exit
-    boolean xCheckInstuctions = (mouseX >= 147+ 154  && mouseX <= 223 +154); // x position check for Instructions
-    boolean xCheckSetAudio = (mouseX >= 147+(154*2) && mouseX <= 223+(154*2)); // x position check for Main Menu
-    boolean xCheckMainMenu = (mouseX >= 147+(154*3) && mouseX <= 223+(154*3)); // x position check for Set Audio
+    boolean xCheckInstuctions = (mouseX >= 147 + 154 && mouseX <= 223 + 154); // x position check for Instructions
+    boolean xCheckSetAudio = (mouseX >= 147 + (154 * 2) && mouseX <= 223 + (154 * 2)); // x position check for Main Menu
+    boolean xCheckMainMenu = (mouseX >= 147 + (154 * 3) && mouseX <= 223 + (154 * 3)); // x position check for Set Audio
 
     if (yCheck == true) {
       if (xCheckExit == true) {
@@ -719,11 +710,11 @@ void mouseClicked() {
         while (true) {
           int tempVolume = getInt("Please enter your desired volume (between 0 for muted and 100 for full volume)");
           if (tempVolume > 100 || tempVolume < 0) {
-            JOptionPane.showMessageDialog(null, "You tried entering: " +  tempVolume + ". The volume must be between 0-100.");
+            JOptionPane.showMessageDialog(null, "You tried entering: " + tempVolume + ". The volume must be between 0-100.");
           } else {
-            JOptionPane.showMessageDialog(null, "The volume has been set to: " +  tempVolume + "%");
+            JOptionPane.showMessageDialog(null, "The volume has been set to: " + tempVolume + "%");
             musicVolume = tempVolume;
-            musicFile.amp(((float)musicVolume) / 100); // set music
+            musicFile.amp(((float) musicVolume) / 100); // set music
             break;
           }
         }
@@ -746,8 +737,8 @@ void introScene() {
   fill(156, 135, 108);
   //rect(120, 80, 220, 220);
   rect(0, 800, 800, 480);
-  for (int i=height; i>=350; i-=10) {
-    rect(0, i+10, width, i);
+  for (int i = height; i >= 350; i -= 10) {
+    rect(0, i + 10, width, i);
   }
   fill(79, 60, 45); //door
   rectMode(CORNERS);
@@ -766,7 +757,7 @@ void introScene() {
   line(75, 0, 75, 360); //wall indications
   line(725, 0, 725, 360);
 
-  fill(180, 95, 6);  //doormat
+  fill(180, 95, 6); //doormat
   rect(550, 365, 125, 70);
 
   fill(138, 0, 252); //curtain on window
@@ -858,7 +849,7 @@ void introScene() {
     text("Also try to keep the baby out of trouble....", 100, 450);
   }
 
-  if (sceneNum == 2 && sceneProgress >= 5 && momBodyX>=870) {
+  if (sceneNum == 2 && sceneProgress >= 5 && momBodyX >= 870) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
     translate(0, 900);
@@ -866,22 +857,22 @@ void introScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -889,12 +880,12 @@ void introScene() {
     fill(0);
     text("yeah yeah whatever....", 100, 450);
   }
-  if (sceneProgress >=6) {
+  if (sceneProgress >= 6) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(147, 105, 70); // hair color
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
@@ -915,7 +906,7 @@ void babyFireSlide() {
   line(783, 165, 783, 466);
 
   pushMatrix();
-  translate(-675, 0);  //doorway on the left
+  translate(-675, 0); //doorway on the left
   line(737, 382, 737, 125);
   translate(-90, 0);
   line(783, 165, 783, 466);
@@ -945,7 +936,7 @@ void babyFireSlide() {
   quad(87, 290, 98, 260, 212, 260, 223, 290);
   fill(245, 0, 0);
   ellipse(125, 275, 25, 15);
-  ellipse(125+55, 275, 25, 15);
+  ellipse(125 + 55, 275, 25, 15);
   if (sceneProgress == 1) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
@@ -954,22 +945,22 @@ void babyFireSlide() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1009,22 +1000,22 @@ void babyFireSlide() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1033,7 +1024,7 @@ void babyFireSlide() {
     text("Oh, that reminds me, your parents left me some money for pizza", 100, 450);
   }
 
-  if (sceneProgress >=6 && sitterArmY==250) {
+  if (sceneProgress >= 6 && sitterArmY == 250) {
     fill(150); // the phone that suddenly appears in the babysitters hand
     rect(560, 250, 20, 35);
   }
@@ -1086,22 +1077,22 @@ void babyFireSlide() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1117,22 +1108,22 @@ void babyFireSlide() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1140,12 +1131,12 @@ void babyFireSlide() {
     fill(0);
     text("Gosh, you just won't pipe down, i'm putting you in your room!", 100, 450);
   }
-  if (sceneProgress >=11) {
+  if (sceneProgress >= 11) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(147, 105, 70); // hair color
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 
@@ -1183,15 +1174,15 @@ void babyCribScene() {
 
   fill(255, 238, 175); //the baby's crib
   rect(85, 250, 10, 150);
-  rect(85+210, 250, 10, 150);
+  rect(85 + 210, 250, 10, 150);
   rect(95, 280, 200, 10);
-  rect(95, 280+100, 200, 10);
+  rect(95, 280 + 100, 200, 10);
 
   fill(142, 193, 255); //crib cushion
   rect(95, 360, 200, 20);
 
   fill(255, 238, 175); //crib bars
-  for (int i=100; i<300; i=i+25) {
+  for (int i = 100; i < 300; i = i + 25) {
     rect(i, 290, 10, 90);
   }
 
@@ -1208,22 +1199,22 @@ void babyCribScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1250,22 +1241,22 @@ void babyCribScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1273,12 +1264,12 @@ void babyCribScene() {
     fill(0);
     text("yeah yeah I get it....", 100, 450);
   }
-  if (sceneProgress >=3) {
+  if (sceneProgress >= 3) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(122, 97, 142); //darker pirple
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
@@ -1289,14 +1280,14 @@ void babyCrawlScene() {
   fill(156, 135, 108);
   quad(0, 500, 75, 360, 725, 360, 800, 500); //floor
   triangle(62, 382, 18, 382, 18, 466); //floor of the other room to the left
-  quad(725, 360, 762.5, 360, 800, 430, 800, 500);//stairs going downwards
+  quad(725, 360, 762.5, 360, 800, 430, 800, 500); //stairs going downwards
   triangle(774, 380, 800, 380, 800, 430);
 
   line(75, 360, 75, 0); //wall indications
   line(725, 360, 725, 0);
 
   pushMatrix();
-  translate(-675, 0);  //doorway on the left
+  translate(-675, 0); //doorway on the left
   line(737, 382, 737, 125);
   translate(-90, 0);
   line(783, 165, 783, 466);
@@ -1309,7 +1300,7 @@ void babyCrawlScene() {
   line(300, 50, 250, 75); //string hanging the painting
   line(300, 50, 350, 75);
 
-  fill(255, 132, 31);  // painting canvas
+  fill(255, 132, 31); // painting canvas
   rect(225, 75, 150, 100);
   fill(159, 250, 96);
   beginShape();
@@ -1327,7 +1318,7 @@ void babyCrawlScene() {
   vertex(310, 110);
   endShape(CLOSE);
 
-  line(550, 135, 450, 155);//string hanging painting two
+  line(550, 135, 450, 155); //string hanging painting two
   line(550, 135, 650, 155);
 
   fill(219, 175, 219); //painting two canvas
@@ -1378,12 +1369,12 @@ void babyCrawlScene() {
 
     text("Guh, gwoohhhh", 100, 450);
   }
-  if (sceneProgress >=2 && babyX == 1100) {
+  if (sceneProgress >= 2 && babyX == 1100) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(122, 97, 142); //darker pirple
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
@@ -1392,22 +1383,22 @@ void babyFallScene() {
   background(90);
   delay(100);
   fill(116, 65, 43); //top of each step
-  int topX=0;
+  int topX = 0;
   int topY;
-  for (topY=475; topY>=0; topY=topY-50) {
-    quad(topX, topY, topX+35, topY-25, 800-(topX+35), topY-25, 800-topX, topY);
-    topX=topX+35;
+  for (topY = 475; topY >= 0; topY = topY - 50) {
+    quad(topX, topY, topX + 35, topY - 25, 800 - (topX + 35), topY - 25, 800 - topX, topY);
+    topX = topX + 35;
   }
 
   fill(188, 106, 70); // the vertical part of each step
-  int stepX=0;
+  int stepX = 0;
   int stepY;
-  for (stepY=475; stepY>=0; stepY=stepY-50) {
-    rect(stepX, stepY, 800-stepX*2, 25);
-    stepX=stepX+35;
+  for (stepY = 475; stepY >= 0; stepY = stepY - 50) {
+    rect(stepX, stepY, 800 - stepX * 2, 25);
+    stepX = stepX + 35;
   }
-  line(0, 475, 332, 0);  //wall indicators
-  line(800, 475, 800-332, 0);
+  line(0, 475, 332, 0); //wall indicators
+  line(800, 475, 800 - 332, 0);
 
   pushMatrix();
   translate(100, -500);
@@ -1420,12 +1411,12 @@ void babyFallScene() {
     text("GAHHAHDHAHGJ!!!!!!!!!!!!", 0, 450);
     textSize(20);
   }
-  if (sceneProgress >=1) {
+  if (sceneProgress >= 1) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(90, 90, 90); // lighter grey
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
@@ -1456,7 +1447,7 @@ void babyPickupScene() {
   quad(0, 350, 0, 300, 25, 260, 50, 260);
   triangle(0, 250, 0, 210, 25, 210);
 
-  strokeWeight(10);  //handrail
+  strokeWeight(10); //handrail
   stroke(183, 166, 79);
   line(-25, 150, 70, 210);
   stroke(0);
@@ -1493,26 +1484,25 @@ void babyPickupScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
-
 
     fill(0);
     text("gosh, aren't you old enough to not fall down the stairs", 100, 450);
@@ -1538,22 +1528,22 @@ void babyPickupScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1561,12 +1551,12 @@ void babyPickupScene() {
     fill(0);
     text("The pizza is here now anyway, \nand because I clearly can't leave you alone \nyou're coming with me", 100, 425);
   }
-  if (sceneProgress >=4) {
+  if (sceneProgress >= 4) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(130, 130, 130); // dark grey
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
@@ -1592,7 +1582,7 @@ void babyPizzaScene() {
   popMatrix();
 
   fill(227, 199, 162);
-  rect(0, 0, 125, 360);  //invisible block for the purpose of making it seem like the parents are in the background
+  rect(0, 0, 125, 360); //invisible block for the purpose of making it seem like the parents are in the background
   line(125, 360, 125, 50); //open concept wall opening
   line(675, 360, 675, 50);
   line(125, 50, 675, 50);
@@ -1631,7 +1621,6 @@ void babyPizzaScene() {
   drawBaby();
   popMatrix();
 
-
   if (sceneProgress == 1) {
     pushMatrix();
     scale(0.9);
@@ -1664,26 +1653,25 @@ void babyPizzaScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
-
 
     fill(0);
     text("What the heck is wrong with you! \nget off of the pizza!", 100, 450);
@@ -1697,22 +1685,22 @@ void babyPizzaScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1720,11 +1708,11 @@ void babyPizzaScene() {
     fill(0);
     text("Oh no, don't you dare throw up!", 100, 450);
   }
-  if (sceneProgress >=5 && babyX==100) {
+  if (sceneProgress >= 5 && babyX == 100) {
     fill(59, 155, 12);
-    triangle(babyX+255, babyY-20, vomitX, vomitY, vomitX, vomitY+40);
+    triangle(babyX + 255, babyY - 20, vomitX, vomitY, vomitX, vomitY + 40);
   }
-  if (sceneProgress == 5 && babyEmotion=="sick") {
+  if (sceneProgress == 5 && babyEmotion == "sick") {
 
     fill(0);
     textSize(70);
@@ -1739,22 +1727,22 @@ void babyPizzaScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1772,22 +1760,22 @@ void babyPizzaScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1795,16 +1783,16 @@ void babyPizzaScene() {
     fill(0);
     text("YOU STUPID BABY!!!", 100, 450);
   }
-  if (sceneProgress !=1 && momBodyX == 1200) {
+  if (sceneProgress != 1 && momBodyX == 1200) {
     fill(0);
     text("how DARE you treat our baby like this! \nwe were watching you on the security cameras the ENTIRE time \nNOW GET OUT!!!", 100, 425);
   }
-  if (sceneProgress >=8 && momBodyX == 1200) {
+  if (sceneProgress >= 8 && momBodyX == 1200) {
     bt5.getController("Next").show();
   } else {
     textSize(15);
     fill(0); // black
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
@@ -1813,7 +1801,7 @@ void tornadoScene() {
   background(20, 60, 72);
 
   delay(100);
-  fill(144, 45, 45);  //the house that the babysitter was in for the entire story in the background
+  fill(144, 45, 45); //the house that the babysitter was in for the entire story in the background
   rect(0, 0, 400, 250);
   quad(400, 0, 500, 0, 500, 150, 400, 250);
 
@@ -1839,10 +1827,10 @@ void tornadoScene() {
   drawSitter();
   popMatrix();
   fill(103); //drawing the big bad tornado that comes by to ruin the babysitters night
-  triangle(tornadoX-20, 60, tornadoX+200, 60, tornadoX+20, 475); //funnel of the tornado
-  arc (tornadoX, -20, 250, 210, radians (55), radians(190)); //clouds that the tornado is coming out of
-  arc (tornadoX+140, -20, 300, 220, radians(0), radians(180));
-  arc(tornadoX+70, -20, 200, 230, radians(0), radians(180));
+  triangle(tornadoX - 20, 60, tornadoX + 200, 60, tornadoX + 20, 475); //funnel of the tornado
+  arc(tornadoX, -20, 250, 210, radians(55), radians(190)); //clouds that the tornado is coming out of
+  arc(tornadoX + 140, -20, 300, 220, radians(0), radians(180));
+  arc(tornadoX + 70, -20, 200, 230, radians(0), radians(180));
   if (sceneProgress == 1) {
     pushMatrix(); //little icon to show speech
     scale(0.4);
@@ -1851,22 +1839,22 @@ void tornadoScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1883,22 +1871,22 @@ void tornadoScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1914,22 +1902,22 @@ void tornadoScene() {
     ellipse(150, 200, 80, 80);
     fill(147, 105, 70);
 
-    int hairY=200;
+    int hairY = 200;
     beginShape(); //hair
     vertex(100, hairY);
-    vertex(135, hairY-10);
-    vertex(135, hairY-15);
-    vertex(165, hairY-15);
-    vertex(165, hairY-10);
+    vertex(135, hairY - 10);
+    vertex(135, hairY - 15);
+    vertex(165, hairY - 15);
+    vertex(165, hairY - 10);
     vertex(200, hairY);
-    vertex(190, hairY-30);
-    vertex(200, hairY-60);
-    vertex(175, hairY-60);
-    vertex(175, hairY-70);
-    vertex(125, hairY-70);
-    vertex(125, hairY-60);
-    vertex(100, hairY-60);
-    vertex(110, hairY-30);
+    vertex(190, hairY - 30);
+    vertex(200, hairY - 60);
+    vertex(175, hairY - 60);
+    vertex(175, hairY - 70);
+    vertex(125, hairY - 70);
+    vertex(125, hairY - 60);
+    vertex(100, hairY - 60);
+    vertex(110, hairY - 30);
     vertex(100, hairY);
     endShape(CLOSE);
     popMatrix();
@@ -1960,17 +1948,16 @@ void tornadoScene() {
   } else {
     textSize(15);
     fill(0); // black
-    text("Press space to continue", 20, 32) ;
+    text("Press space to continue", 20, 32);
     textSize(20);
   }
 }
 
-
 void splashScreen() {
   noStroke();
   babyEmotion = "sick";
-  parentsMad=true;
-  sitterEmotion="unamused";
+  parentsMad = true;
+  sitterEmotion = "unamused";
 
   background(252, 229, 205); // beige bc
   fill(102, 0, 0);
@@ -2014,68 +2001,66 @@ void splashScreen() {
 
   fill(246, 178, 107);
   beginShape();
-  vertex(0, 220);
-  vertex(20, 310);
-  vertex(34, 329);
-  vertex(47, 297);
-  vertex(60, 250);
-  vertex(68, 275);
-  vertex(86, 294);
-  vertex(100, 320);
-  vertex(140, 275);
-  vertex(159, 193);
-  vertex(180, 250);
-  vertex(190, 320);
-  vertex(230, 230);
-  vertex(260, 270);
-  vertex(280, 350);
-  vertex(312, 284);
-  vertex(330, 206);
-  vertex(360, 328);
-  vertex(434, 250);
-  vertex(450, 190);
-  vertex(489, 240);
-  vertex(520, 335);
-  vertex(577, 193);
-  vertex(600, 288);
-  vertex(634, 354);
-  vertex(658, 309);
-  vertex(687, 284);
-  vertex(720, 180);
-  vertex(734, 235);
-  vertex(756, 283);
-  vertex(776, 248);
-  vertex(800, 180);
+  vertex(0, splashScreenFire);
+  vertex(20, splashScreenFire+90);
+  vertex(34, splashScreenFire+109);
+  vertex(47, splashScreenFire+77);
+  vertex(60, splashScreenFire+30);
+  vertex(68, splashScreenFire+55);
+  vertex(86, splashScreenFire+74);
+  vertex(100, splashScreenFire+100);
+  vertex(140, splashScreenFire+55);
+  vertex(159, splashScreenFire-27);
+  vertex(180, splashScreenFire+30);
+  vertex(190, splashScreenFire+100);
+  vertex(230, splashScreenFire+10);
+  vertex(260, splashScreenFire+50);
+  vertex(280, splashScreenFire+130);
+  vertex(312, splashScreenFire+64);
+  vertex(330, splashScreenFire-14);
+  vertex(360, splashScreenFire+128);
+  vertex(434, splashScreenFire+30);
+  vertex(450, splashScreenFire-30);
+  vertex(489, splashScreenFire+20);
+  vertex(520, splashScreenFire+115);
+  vertex(577, splashScreenFire+27);
+  vertex(600, splashScreenFire+68);
+  vertex(634, splashScreenFire+134);
+  vertex(658, splashScreenFire+89);
+  vertex(687, splashScreenFire+64);
+  vertex(720, splashScreenFire-50);
+  vertex(734, splashScreenFire+15);
+  vertex(756, splashScreenFire+53);
+  vertex(776, splashScreenFire+28);
+  vertex(800, splashScreenFire-50);
 
   vertex(800, 800);
   vertex(0, 800);
 
   endShape(CLOSE);
 
-
-
   int spacing = 7; // pixels between lines
   int len = 6; // pixel length of each line
   int baseY = 100; // base Y value to position other elements off of
   textSize(15);
   fill(102, 0, 0); // red
-  text("By Jason Cameron & Simon Michetti Studios", 76, baseY-10);
+  text("By Jason Cameron & Simon Michetti Studios", 76, baseY - 10);
   textSize(20); // set it back to the original 20
-  for (int x=90; x<=340; x+=(spacing+len)) {// from 300 to 100
+  for (int x = 90; x <= 340; x += (spacing + len)) { // from 300 to 100  //drawing a flourish on the splash screen/ main menu
     strokeWeight(4);
     stroke(241, 194, 50); // gold
-    line(x, baseY, x+len, baseY);
+    line(x, baseY, x + len, baseY);
   }
-  for (int x=110; x<=320; x+=(spacing+len)) {// from 300 to 100
+  for (int x = 110; x <= 320; x += (spacing + len)) { // from 300 to 100
     strokeWeight(3);
     stroke(246, 178, 107); // orange
-    line(x, baseY + 10, x+len, baseY + 10);
+    line(x, baseY + 10, x + len, baseY + 10);
     x += (spacing + len) / 1.5;
   }
-  for (int x=130; x<=300; x+=(spacing+len)) {// from 270 to 130
+  for (int x = 130; x <= 300; x += (spacing + len)) { // from 270 to 130
     strokeWeight(2.7);
     stroke(102, 0, 0); // red
-    line(x, baseY+20, x+len, baseY+20);
+    line(x, baseY + 20, x + len, baseY + 20);
   }
 
   textAlign(CENTER);
@@ -2100,116 +2085,117 @@ void splashScreen() {
     popMatrix();
     drawBaby();
     popMatrix();
-  } else {
+  } else if (sceneProgress==0) {
     textSize(24);
     text("Skip to", 20, height - (18 * 8)); // add skip to text for scene skipper
     textSize(20);
+    fill(0, 0, 0);
+    noStroke();
+    int middle = (width / 2) - 40; // compensate for the fact that controlp5 draws from top corner
+    rect(middle, height - 125, 80, 50);
   }
 }
 
-
 void drawSitter() {
-  int hairY=200;
+  int hairY = 200;
 
-  if (sitterEmotion=="angry") {
+  if (sitterEmotion == "angry") {
     fill(252, 232, 194); //head
     ellipse(sitterX, 200, 80, 80);
     fill(0); //eyes
-    arc(sitterX-20, 200, 30, 30, radians(45), radians(225));
-    arc(sitterX+20, 200, 30, 30, radians(315), radians(495));
+    arc(sitterX - 20, 200, 30, 30, radians(45), radians(225));
+    arc(sitterX + 20, 200, 30, 30, radians(315), radians(495));
 
     stroke(1);
-    line(sitterX, 120, sitterX-10, 110); //steam coming from the babysitters head
-    line(sitterX-10, 110, sitterX+5, 110);
+    line(sitterX, 120, sitterX - 10, 110); //steam coming from the babysitters head
+    line(sitterX - 10, 110, sitterX + 5, 110);
     strokeWeight(2);
-    line(sitterX+5, 110, sitterX-15, 100);
-    line(sitterX-15, 100, sitterX+10, 100);
+    line(sitterX + 5, 110, sitterX - 15, 100);
+    line(sitterX - 15, 100, sitterX + 10, 100);
     strokeWeight(3);
-    line(sitterX+10, 100, sitterX-20, 90);
-    line(sitterX-20, 90, sitterX+15, 90);
+    line(sitterX + 10, 100, sitterX - 20, 90);
+    line(sitterX - 20, 90, sitterX + 15, 90);
     strokeWeight(4);
-    line(sitterX+15, 90, sitterX-25, 80);
-    line(sitterX-25, 80, sitterX+20, 80);
+    line(sitterX + 15, 90, sitterX - 25, 80);
+    line(sitterX - 25, 80, sitterX + 20, 80);
     strokeWeight(5);
-    line(sitterX+20, 80, sitterX-30, 70);
-    line(sitterX-30, 70, sitterX+25, 70);
+    line(sitterX + 20, 80, sitterX - 30, 70);
+    line(sitterX - 30, 70, sitterX + 25, 70);
     strokeWeight(6);
-    line(sitterX+25, 70, sitterX-35, 60);
-    line(sitterX-35, 60, sitterX+30, 60);
+    line(sitterX + 25, 70, sitterX - 35, 60);
+    line(sitterX - 35, 60, sitterX + 30, 60);
     strokeWeight(7);
-    line(sitterX+30, 60, sitterX-40, 50);
-    line(sitterX-40, 50, sitterX+35, 50);
-  } else if (sitterEmotion=="shocked") {
+    line(sitterX + 30, 60, sitterX - 40, 50);
+    line(sitterX - 40, 50, sitterX + 35, 50);
+  } else if (sitterEmotion == "shocked") {
     strokeWeight(1);
     fill(252, 232, 194); //head
     ellipse(sitterX, 200, 80, 80);
     fill(0); //eyes
-    ellipse(sitterX-20, 200, 30, 40);
-    ellipse(sitterX+20, 200, 30, 40);
+    ellipse(sitterX - 20, 200, 30, 40);
+    ellipse(sitterX + 20, 200, 30, 40);
 
-    hairY=160;
+    hairY = 160;
   } else { // unamused
     stroke(0);
     fill(252, 232, 194); //head
     ellipse(sitterX, 200, 80, 80);
     fill(0); //eyes
-    arc(sitterX-20, 200, 30, 30, radians(0), radians(180));
-    arc(sitterX+20, 200, 30, 30, radians(0), radians(180));
+    arc(sitterX - 20, 200, 30, 30, radians(0), radians(180));
+    arc(sitterX + 20, 200, 30, 30, radians(0), radians(180));
   }
-
 
   stroke(0);
   strokeWeight(1);
   fill(212, 242, 247); //body
-  rect(sitterX-40, 240, 80, 150);
+  rect(sitterX - 40, 240, 80, 150);
 
   fill(255, 168, 62); //stripes on the shirt
-  for (int i=265; i<380; i=i+40) {
-    rect(sitterX-40, i, 80, 20);
+  for (int i = 265; i < 380; i = i + 40) {
+    rect(sitterX - 40, i, 80, 20);
   }
 
-  line(sitterX-40, 240, sitterX-60, 300); //left arm
-  line(sitterX-60, 300, sitterX-60, sitterArmY2);
+  line(sitterX - 40, 240, sitterX - 60, 300); //left arm
+  line(sitterX - 60, 300, sitterX - 60, sitterArmY2);
 
-  line(sitterX+40, 240, sitterX+60, 300); //right arm
-  line(sitterX+60, 300, sitterArmX, sitterArmY);
+  line(sitterX + 40, 240, sitterX + 60, 300); //right arm
+  line(sitterX + 60, 300, sitterArmX, sitterArmY);
 
-  line(sitterX-30, 390, sitterX-30, 450); //left leg
-  line(sitterX-30, 450, sitterX-40, 450);
+  line(sitterX - 30, 390, sitterX - 30, 450); //left leg
+  line(sitterX - 30, 450, sitterX - 40, 450);
 
-  line(sitterX+30, 390, sitterX+30, 450); //right leg
-  line(sitterX+30, 450, sitterX+40, 450);
+  line(sitterX + 30, 390, sitterX + 30, 450); //right leg
+  line(sitterX + 30, 450, sitterX + 40, 450);
 
   fill(147, 105, 70);
   beginShape(); //hair
-  vertex(sitterX-50, hairY);
-  vertex(sitterX-15, hairY-10);
-  vertex(sitterX-15, hairY-15);
-  vertex(sitterX+15, hairY-15);
-  vertex(sitterX+15, hairY-10);
-  vertex(sitterX+50, hairY);
-  vertex(sitterX+40, hairY-30);
-  vertex(sitterX+50, hairY-60);
-  vertex(sitterX+25, hairY-60);
-  vertex(sitterX+25, hairY-70);
-  vertex(sitterX-25, hairY-70);
-  vertex(sitterX-25, hairY-60);
-  vertex(sitterX-50, hairY-60);
-  vertex(sitterX-40, hairY-30);
-  vertex(sitterX-50, hairY);
+  vertex(sitterX - 50, hairY);
+  vertex(sitterX - 15, hairY - 10);
+  vertex(sitterX - 15, hairY - 15);
+  vertex(sitterX + 15, hairY - 15);
+  vertex(sitterX + 15, hairY - 10);
+  vertex(sitterX + 50, hairY);
+  vertex(sitterX + 40, hairY - 30);
+  vertex(sitterX + 50, hairY - 60);
+  vertex(sitterX + 25, hairY - 60);
+  vertex(sitterX + 25, hairY - 70);
+  vertex(sitterX - 25, hairY - 70);
+  vertex(sitterX - 25, hairY - 60);
+  vertex(sitterX - 50, hairY - 60);
+  vertex(sitterX - 40, hairY - 30);
+  vertex(sitterX - 50, hairY);
   endShape(CLOSE);
 
-  if (sitterEmotion=="shocked") {
-    noFill();  //eyebrows
+  if (sitterEmotion == "shocked") {
+    noFill(); //eyebrows
     strokeWeight(10);
     stroke(144, 119, 80);
-    arc(sitterX-20, 160, 20, 30, radians(180), radians(360));
-    arc(sitterX+20, 160, 20, 30, radians(180), radians(360));
+    arc(sitterX - 20, 160, 20, 30, radians(180), radians(360));
+    arc(sitterX + 20, 160, 20, 30, radians(180), radians(360));
     stroke(0);
     strokeWeight(1);
   }
 }
-
 
 void drawMom() {
   fill(255, 242, 121); //hair
@@ -2219,31 +2205,31 @@ void drawMom() {
   ellipse(momBodyX, 250, 80, 80);
 
   fill(240, 126, 225); //dress
-  triangle(momBodyX, 302, momBodyX-50, 402, momBodyX+50, 402);
-  triangle(momBodyX-50, 292, momBodyX+50, 292, momBodyX, 352);
+  triangle(momBodyX, 302, momBodyX - 50, 402, momBodyX + 50, 402);
+  triangle(momBodyX - 50, 292, momBodyX + 50, 292, momBodyX, 352);
 
-  line(momBodyX-50, 292, momBodyX-60, 332); //left mom arm
-  line(momBodyX-60, 332, momArmX+40, momArmY+150);
+  line(momBodyX - 50, 292, momBodyX - 60, 332); //left mom arm
+  line(momBodyX - 60, 332, momArmX + 40, momArmY + 150);
 
-  line(momBodyX+50, 292, momBodyX+60, 332); //right arm
-  line(momBodyX+60, 332, momBodyX+60, 382);
+  line(momBodyX + 50, 292, momBodyX + 60, 332); //right arm
+  line(momBodyX + 60, 332, momBodyX + 60, 382);
 
-  line(momBodyX-30, 402, momBodyX-30, 452); //left leg
-  line(momBodyX-30, 452, momBodyX-40, 452);
+  line(momBodyX - 30, 402, momBodyX - 30, 452); //left leg
+  line(momBodyX - 30, 452, momBodyX - 40, 452);
 
-  line(momBodyX+30, 402, momBodyX+30, 452); //right leg
-  line(momBodyX+30, 452, momBodyX+40, 452);
+  line(momBodyX + 30, 402, momBodyX + 30, 452); //right leg
+  line(momBodyX + 30, 452, momBodyX + 40, 452);
 
   fill(0); //eyes
-  ellipse(momBodyX-20, 255, 25, 25); //left eye
-  ellipse(momBodyX+20, 255, 25, 25); //right eye
+  ellipse(momBodyX - 20, 255, 25, 25); //left eye
+  ellipse(momBodyX + 20, 255, 25, 25); //right eye
 
-  if (parentsMad==true) {
+  if (parentsMad == true) {
     fill(252, 232, 194); //head
     ellipse(momBodyX, 250, 80, 80);
     fill(0);
-    arc(momBodyX-20, 255, 25, 25, radians(45), radians(225));
-    arc(momBodyX+20, 255, 25, 25, radians(315), radians(495));
+    arc(momBodyX - 20, 255, 25, 25, radians(45), radians(225));
+    arc(momBodyX + 20, 255, 25, 25, radians(315), radians(495));
   }
 }
 
@@ -2252,54 +2238,54 @@ void drawDad() {
   ellipse(dadBodyX, 150, 80, 80);
 
   fill(55); //body
-  rect(dadBodyX-30, 210, 60, 175);
+  rect(dadBodyX - 30, 210, 60, 175);
 
   fill(255); //suit detail
-  triangle(dadBodyX-10, 210, dadBodyX, 240, dadBodyX+10, 210);
+  triangle(dadBodyX - 10, 210, dadBodyX, 240, dadBodyX + 10, 210);
 
-  line(dadBodyX-30, 210, dadBodyX-50, 280); //left arm
-  line(dadBodyX-50, 280, dadBodyX-50, 350);
+  line(dadBodyX - 30, 210, dadBodyX - 50, 280); //left arm
+  line(dadBodyX - 50, 280, dadBodyX - 50, 350);
 
-  line(dadBodyX+30, 210, dadBodyX+50, 280); //right arm
-  line(dadBodyX+50, 280, dadBodyX+50, 350);
+  line(dadBodyX + 30, 210, dadBodyX + 50, 280); //right arm
+  line(dadBodyX + 50, 280, dadBodyX + 50, 350);
 
-  line(dadBodyX-20, 385, dadBodyX-20, 455); //left leg
-  line(dadBodyX-20, 455, dadBodyX-30, 455);
+  line(dadBodyX - 20, 385, dadBodyX - 20, 455); //left leg
+  line(dadBodyX - 20, 455, dadBodyX - 30, 455);
 
-  line(dadBodyX+20, 385, dadBodyX+20, 455); //right leg
-  line(dadBodyX+20, 455, dadBodyX+30, 455);
+  line(dadBodyX + 20, 385, dadBodyX + 20, 455); //right leg
+  line(dadBodyX + 20, 455, dadBodyX + 30, 455);
 
   fill(0); //glasses
-  ellipse(dadBodyX-20, 155, 20, 20);
-  ellipse(dadBodyX+20, 155, 20, 20);
+  ellipse(dadBodyX - 20, 155, 20, 20);
+  ellipse(dadBodyX + 20, 155, 20, 20);
   strokeWeight(5);
-  line(dadBodyX-20, 155, dadBodyX+20, 155);
+  line(dadBodyX - 20, 155, dadBodyX + 20, 155);
 
   strokeWeight(1);
   fill(255, 242, 121); //beard
   arc(dadBodyX, 180, 40, 30, radians(180), radians(360));
-  arc(dadBodyX-20, 190, 40, 30, radians(135), radians(270));
-  arc(dadBodyX-15, 205, 40, 30, radians(70), radians(190));
-  arc(dadBodyX+5, 220, 30, 20, radians(0), radians(180));
-  arc(dadBodyX+20, 200, 40, 40, radians(270), radians(450));
+  arc(dadBodyX - 20, 190, 40, 30, radians(135), radians(270));
+  arc(dadBodyX - 15, 205, 40, 30, radians(70), radians(190));
+  arc(dadBodyX + 5, 220, 30, 20, radians(0), radians(180));
+  arc(dadBodyX + 20, 200, 40, 40, radians(270), radians(450));
   noStroke();
-  ellipse(dadBodyX+3, 200, 70, 43);
+  ellipse(dadBodyX + 3, 200, 70, 43);
 
-  if (parentsMad==true) {
+  if (parentsMad == true) {
     stroke(0);
     fill(252, 232, 194); //head
     ellipse(dadBodyX, 150, 80, 80);
     fill(0);
-    arc(dadBodyX-20, 155, 20, 20, radians(45), radians(225));
-    arc(dadBodyX+20, 155, 20, 20, radians(315), radians(495));
+    arc(dadBodyX - 20, 155, 20, 20, radians(45), radians(225));
+    arc(dadBodyX + 20, 155, 20, 20, radians(315), radians(495));
     fill(255, 242, 121); //beard
     arc(dadBodyX, 180, 40, 30, radians(180), radians(360));
-    arc(dadBodyX-20, 190, 40, 30, radians(135), radians(270));
-    arc(dadBodyX-15, 205, 40, 30, radians(70), radians(190));
-    arc(dadBodyX+5, 220, 30, 20, radians(0), radians(180));
-    arc(dadBodyX+20, 200, 40, 40, radians(270), radians(450));
+    arc(dadBodyX - 20, 190, 40, 30, radians(135), radians(270));
+    arc(dadBodyX - 15, 205, 40, 30, radians(70), radians(190));
+    arc(dadBodyX + 5, 220, 30, 20, radians(0), radians(180));
+    arc(dadBodyX + 20, 200, 40, 40, radians(270), radians(450));
     noStroke();
-    ellipse(dadBodyX+3, 200, 70, 43);
+    ellipse(dadBodyX + 3, 200, 70, 43);
   }
 }
 
@@ -2310,84 +2296,83 @@ void drawBaby() {
     rect(babyX, babyY, 40, 40, 50, 50, 0, 0); //body
 
     fill(255);
-    rect(babyX-5, babyY+30, 50, 10); //diaper
-    quad(babyX, babyY+40, babyX+40, babyY+40, babyX+35, babyY+60, babyX+5, babyY+60);
+    rect(babyX - 5, babyY + 30, 50, 10); //diaper
+    quad(babyX, babyY + 40, babyX + 40, babyY + 40, babyX + 35, babyY + 60, babyX + 5, babyY + 60);
 
     fill(252, 232, 194);
-    rect(babyX-40, babyY+10, 40, 10); //arms
-    rect(babyX+40, babyY+10, 40, 10);
+    rect(babyX - 40, babyY + 10, 40, 10); //arms
+    rect(babyX + 40, babyY + 10, 40, 10);
 
-    quad(babyX+3, babyY+48, babyX+5, babyY+60, babyX-40, babyY+70, babyX-40, babyY+60); //legs
-    quad(babyX+37, babyY+48, babyX+35, babyY+60, babyX+80, babyY+70, babyX+80, babyY+60);
+    quad(babyX + 3, babyY + 48, babyX + 5, babyY + 60, babyX - 40, babyY + 70, babyX - 40, babyY + 60); //legs
+    quad(babyX + 37, babyY + 48, babyX + 35, babyY + 60, babyX + 80, babyY + 70, babyX + 80, babyY + 60);
 
+    if (babyEmotion == "sick") {
+      fill(167, 222, 157);
+      ellipse(babyX + 20, babyY - 10, 40, 40); //head
 
-    if (babyEmotion=="sick") {
-      fill (167, 222, 157);
-      ellipse(babyX+20, babyY-10, 40, 40); //head
-
-      fill(0);  //eyes
-      arc(babyX+10, babyY-10, 10, 15, radians(180), radians(360));
-      arc(babyX+30, babyY-10, 10, 15, radians(180), radians(360));
-    } else if (babyEmotion=="crying") {
+      fill(0); //eyes
+      arc(babyX + 10, babyY - 10, 10, 15, radians(180), radians(360));
+      arc(babyX + 30, babyY - 10, 10, 15, radians(180), radians(360));
+    } else if (babyEmotion == "crying") {
       fill(252, 232, 194);
-      ellipse(babyX+20, babyY-10, 40, 40); //head
+      ellipse(babyX + 20, babyY - 10, 40, 40); //head
 
       fill(0);
-      ellipse(babyX+5, babyY-10, 15, 10); //eyes
-      ellipse(babyX+35, babyY-10, 15, 10);
+      ellipse(babyX + 5, babyY - 10, 15, 10); //eyes
+      ellipse(babyX + 35, babyY - 10, 15, 10);
 
-      fill(86, 218, 250);  //tears
-      rect(babyX-1, babyY-5, 10, 20);
-      rect(babyX+29, babyY-5, 10, 20);
-    } else if (babyEmotion=="shocked") {
+      fill(86, 218, 250); //tears
+      rect(babyX - 1, babyY - 5, 10, 20);
+      rect(babyX + 29, babyY - 5, 10, 20);
+    } else if (babyEmotion == "shocked") {
       fill(252, 232, 194);
-      ellipse(babyX+20, babyY-10, 40, 40); //head
+      ellipse(babyX + 20, babyY - 10, 40, 40); //head
 
       fill(0);
-      ellipse(babyX+10, babyY-10, 10, 20); //eyes
-      ellipse(babyX+30, babyY-10, 10, 20);
+      ellipse(babyX + 10, babyY - 10, 10, 20); //eyes
+      ellipse(babyX + 30, babyY - 10, 10, 20);
 
-      noFill();  //eyebrows
+      noFill(); //eyebrows
       stroke(255, 242, 121);
       strokeWeight(5);
-      arc(babyX+10, babyY-25, 10, 10, radians(180), radians(360));
-      arc(babyX+30, babyY-25, 10, 10, radians(180), radians(360));
+      arc(babyX + 10, babyY - 25, 10, 10, radians(180), radians(360));
+      arc(babyX + 30, babyY - 25, 10, 10, radians(180), radians(360));
 
       stroke(0);
       strokeWeight(1);
     } else {
       fill(252, 232, 194);
-      ellipse(babyX+20, babyY-10, 40, 40); //head
+      ellipse(babyX + 20, babyY - 10, 40, 40); //head
       fill(0);
-      ellipse(babyX+10, babyY-10, 10, 10); //eyes
-      ellipse(babyX+30, babyY-10, 10, 10);
+      ellipse(babyX + 10, babyY - 10, 10, 10); //eyes
+      ellipse(babyX + 30, babyY - 10, 10, 10);
     }
   }
 
-  if (sceneNum==5) {  //baby in a crawling position that only appears in this scene
+  if (sceneNum == 5) { //baby in a crawling position that only appears in this scene
     fill(252, 232, 194);
-    rect(babyX-25, 350, 60, 30, 50, 50, 0, 0); //body
+    rect(babyX - 25, 350, 60, 30, 50, 50, 0, 0); //body
 
     fill(255);
-    rect(babyX-15, 345, 10, 40); //diaper
-    quad(babyX-15, 345, babyX-15, 385, babyX-40, 375, babyX-40, 355);
+    rect(babyX - 15, 345, 10, 40); //diaper
+    quad(babyX - 15, 345, babyX - 15, 385, babyX - 40, 375, babyX - 40, 355);
 
     fill(252, 232, 194);
-    ellipse(babyX+30, 340, 40, 40); //head
+    ellipse(babyX + 30, 340, 40, 40); //head
     fill(0);
-    ellipse(babyX+20, 340, 10, 10); //eyes
-    ellipse(babyX+40, 340, 10, 10);
+    ellipse(babyX + 20, 340, 10, 10); //eyes
+    ellipse(babyX + 40, 340, 10, 10);
 
     fill(252, 232, 194);
 
     pushMatrix();
     translate(-35, -30);
-    quad(babyX+3, 398, babyX+5, 410, babyX-40, 420, babyX-40, 410); //legs of the crawling baby
+    quad(babyX + 3, 398, babyX + 5, 410, babyX - 40, 420, babyX - 40, 410); //legs of the crawling baby
     popMatrix();
 
     pushMatrix();
     translate(-5, -30);
-    quad(babyX+37, 398, babyX+35, 410, babyX+70, 420, babyX+70, 410); //arms of the crawling baby
+    quad(babyX + 37, 398, babyX + 35, 410, babyX + 70, 420, babyX + 70, 410); //arms of the crawling baby
     popMatrix();
   }
 }
